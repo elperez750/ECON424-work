@@ -1,0 +1,338 @@
+---
+title: "ECON 424 Chapter 1 Computer Exercises"
+author: John Doe
+date: "Monday, September 28, 2026"
+output: word_document
+---
+
+*Before you knit, replace "John Doe" in the header above with your own name. Type your answers after each* **Answer:** *line.*
+
+*Exercise and part numbers follow Wooldridge's Chapter 1 computer exercises; some are skipped.*
+
+```{r message=F, warning=F, error=F}
+library(wooldridge)
+library(dplyr)
+```
+
+## C1
+
+Use the data in WAGE1 for this exercise.
+
+### (i) Find the average education level in the sample. What are the lowest and highest years of education?
+
+```{r}
+summary( wage1$educ )
+```
+
+**Answer:** The average education level in the sample is `r round( mean( wage1$educ ), 2 )` years. The lowest is `r min( wage1$educ )` years and the highest is `r max( wage1$educ )` years.
+
+### (ii) Find the average hourly wage in the sample. Does it seem high or low?
+
+**Answer:** The average hourly wage in the sample is \$`r sprintf( "%.2f", mean( wage1$wage ) )` per hour. *Your turn: does this seem high or low? Why?*
+
+### (iii) The wage data are reported in 1976 dollars. Obtain and report the CPI for the years 1976 and 2013.
+
+**Answer:** CPI for 1976 was 56.933. CPI for 2013 was 232.957.
+
+### (iv) Use the CPI values from part (iii) to find the average hourly wage in 2013 dollars. Now, does the average hourly wage seem reasonable?
+
+**Answer:** In 2013 dollars, the average is \$`r sprintf( "%.2f", mean( wage1$wage ) * (232.957 / 56.933) )` per hour. At 40 hours a week for 50 weeks, that's about \$48,000 a year, which seems reasonable.
+
+### (v) How many women are in the sample? How many men?
+
+There are a few ways of doing this. Here are two.
+
+*Add up the number of "1's" in data\$female. Then subtract from n_obs to get the number of males.*
+
+```{r}
+sum( wage1$female )
+length( wage1$female ) - sum( wage1$female )
+```
+
+*Use the dplyr package, and then the count command.*
+
+```{r}
+wage1 |> count(female == 1)
+```
+
+The \|\> command is called the pipe operator. It takes the data on the left, and plugs it into the function on the right.
+
+Anything in a code chunk, or in a script file, that follows one or more of the number/pound symbol (\#) is a "comment" and isn't run. As you get further along, it is a VERY good idea to leave yourself notes through comments in your code.
+
+You don't have to, but in the case of R Markdown it's a good idea to take out your comments before you compile your document, otherwise they show up in your document. You can always delete them after you knit, though.
+
+**Answer:** There are `r sum( wage1$female )` women and `r length( wage1$female ) - sum( wage1$female )` men in the sample.
+
+------------------------------------------------------------------------
+
+## C2 Use the data in BWGHT to answer this question.
+
+### (i) How many women are in the sample, and how many report smoking during pregnancy?
+
+For the first part, all the observations in the data are of women. You can read the number in the "environment" tab, or you can calculate
+
+```{r}
+length( bwght$cigs )
+```
+
+For the second part, a few options. Easiest one is to use the dplyr library, and count command.
+
+```{r}
+bwght |> count( cigs > 0 )
+```
+
+**Answer:**
+
+### (ii) What is the average number of cigarettes smoked per day? Is the average a good measure of the "typical" woman in this case? Explain.
+
+Here you can use the mean() command on variable bwght\$cigs.
+
+```{r}
+mean ( bwght$cigs )
+```
+
+**Answer:**
+
+### (iii) Among women who smoked during pregnancy, what is the average number of cigarettes smoked per day? How does this compare with your answer from part (ii), and why?
+
+A few ways to do this as well. One is to only select observations for which cigs \> 0. In R you can use conditional statements in row/column selection. In this case, you want the mean of rows where cigs \> 0, and you want the mean of the "cigs" column.
+
+```{r}
+mean( bwght [ bwght$cigs > 0, "cigs" ] )
+```
+
+There's also a subset command. You can take a subset of your data -- I'm calling the subset "smoker" -- and then calculate the mean of the "cigs" values for the individuals in that subset.
+
+```{r}
+smoker <- subset( bwght, cigs > 0 )
+mean( smoker$cigs )
+```
+
+**Answer:**
+
+### (iv) Find the average of *fatheduc* in the sample. Why are only 1,192 observations used to compute this average?
+
+There are quite a few NA's (not available) in this series, so you can't just use the mean() command. However, summary() works. So does using mean() with the option na.rm = TRUE, which tells R to remove the NA's before calculating.
+
+```{r}
+summary( bwght$fatheduc )
+
+mean( bwght$fatheduc, na.rm = TRUE )
+```
+
+**Answer:**
+
+### (v) Report the average family income and its standard deviation in dollars.
+
+You can use the mean() command. And there's a sd() command for standard deviation. Be careful: *faminc* is measured in thousands of dollars, so you'll need to multiply by 1,000 to report your answers in dollars.
+
+```{r}
+mean( bwght$faminc ) * 1000
+```
+
+Now it's your turn. In the chunk below, copy the line above and change mean to sd.
+
+```{r}
+# Your turn: copy the line above and change mean to sd
+
+```
+
+**Answer:**
+
+------------------------------------------------------------------------
+
+## C3 The data in MEAP01 are for the state of Michigan in the year 2001. Use these data to answer the following questions.
+
+### (i) Find the largest and smallest values of *math4*. Does the range make sense? Explain.
+
+You can use the summary() command.
+
+```{r}
+summary( meap01$math4 )
+```
+
+**Answer:**
+
+### (ii) How many schools have a perfect pass rate on the math test? What percentage is this of the total sample?
+
+Easiest way is the count() command. Then you can calculate the percentage: the number of schools with a perfect pass rate, divided by the total number of schools, times 100.
+
+```{r}
+meap01 |> count( math4 == 100 )
+
+sum( meap01$math4 == 100 ) / length( meap01$math4 ) * 100
+```
+
+
+**Answer:**
+
+### (iv) Compare the average pass rates for the math and reading scores. Which test is harder to pass?
+
+```{r}
+mean( meap01$math4 )
+```
+
+Now it's your turn. In the chunk below, copy the line above and change math4 to read4.
+
+```{r}
+# Your turn: copy the line above and change math4 to read4
+
+```
+
+**Answer:**
+
+### (v) Find the correlation between *math4* and *read4*. What do you conclude?
+
+Correlation command is cor().
+
+```{r}
+cor( meap01$math4, meap01$read4 )
+```
+
+**Answer:**
+
+### (vii) Suppose School A spends \$6,000 per student and School B spends \$5,500 per student. By what percentage does School A's spending exceed School B's? Compare this to 100[log(6,000)-log(5,500)], which is the approximation percentage difference based on the difference in the natural logs.
+
+The first line below calculates the exact percentage difference. In R the command for natural log is log(), so the second line calculates the log approximation.
+
+```{r}
+( 6000 - 5500 ) / 5500 * 100
+
+100 * ( log(6000) - log(5500) )
+```
+
+**Answer:**
+
+------------------------------------------------------------------------
+
+## C4 The data in JTRAIN2 come from a job training experiment conducted for low-income men during 1976-1977; see Lalonde (1986).
+
+### (i) Use the indicator variable *train* to determine the fraction of men receiving job training.
+
+The variable *train* is binary (1 if the man received job training, 0 if not), so its average is the fraction of men who received training.
+
+```{r}
+mean( jtrain2$train )
+```
+
+**Answer:**
+
+### (ii) The variable *re78* is earnings from 1978, measured in thousands of 1982 dollars. Find the averages of *re78* for the sample of men receiving job training and the sample not receiving job training. Is the difference economically large?
+
+Here you'll subset the data again.
+
+```{r}
+trained <- subset( jtrain2, train > 0 )
+not_trained <- subset(jtrain2, train == 0 )
+```
+
+Then you take the mean of *re78* for each group.
+
+```{r}
+mean( trained$re78 )
+
+mean( not_trained$re78 )
+```
+
+
+**Answer:**
+
+### (iii) The variable *unem78* is an indicator of whether a man is unemployed or not in 1978. What fraction of the men who received job training are unemployed? What about for men who did not receive job training? Comment on the difference.
+
+Use the trained and not_trained subsets from before.
+
+```{r}
+mean( trained$unem78 )
+```
+
+Now it's your turn. In the chunk below, copy the line above and change trained to not_trained.
+
+```{r}
+# Your turn: copy the line above and change trained to not_trained
+
+```
+
+**Answer:**
+
+### (iv) From parts (ii) and (iii), does it appear that the job training program was effective? What would make our conclusions more convincing?
+
+**Answer:**
+
+------------------------------------------------------------------------
+
+## C6 Use the data in COUNTYMURDERS to answer this question. Use only the year 1996. The variable *murders* is the number of murders reported in the county. The variable *execs* is the number of executions that took place of people sentenced to death in the given county. Most states in the United States have the death penalty, but several do not.
+
+### (i) How many counties are there in the data set? Of these, how many have zero murders? What percentage of counties have zero executions? (Remember, use only the 1996 data.)
+
+First subset the data:
+
+```{r}
+countymurders96 <- countymurders |> subset( year == 1996 )
+```
+
+```{r}
+length( countymurders96$countyid )
+
+countymurders96 |> count( murders == 0 )
+
+mean( countymurders96$execs == 0 )
+```
+
+The last line uses a handy trick: *execs == 0* is TRUE (1) or FALSE (0) for each county, and the average of a variable that only takes the values 0 and 1 is the proportion of 1's. So its mean is the proportion of counties with zero executions. Multiply by 100 to get a percentage.
+
+**Answer:**
+
+### (ii) What is the largest number of murders? What is the largest number of executions? Why is the average number of executions so small?
+
+```{r}
+max( countymurders96$murders )
+
+max( countymurders96$execs )
+```
+
+**Answer:**
+
+### (iii) Compute the correlation coefficient between *murders* and *execs* and describe what you find.
+
+```{r}
+cor( countymurders96$murders, countymurders96$execs )
+```
+
+**Answer:**
+
+### (iv) You should have computed a positive correlation in part (iii). Do you think that more executions *cause* more murders to occur? What might explain the positive correlation?
+
+**Answer:**
+
+------------------------------------------------------------------------
+
+## C8 The data in ECONMATH were obtained on students from a large university course in introductory microeconomics. For this problem, we are interested in two variables: *score*, which is the final course score, and *econhs*, which is a binary variable indicating whether a student took an economics course in high school.
+
+### (i) How many students are in the sample? How many students report taking an economics course in high school?
+
+```{r}
+length(econmath$score)
+sum(econmath$econhs)
+```
+
+**Answer:**
+
+### (ii) Find the average of *score* for those students who did take a high school economics class. How does it compare with the average of *score* for those who did not?
+
+```{r}
+with_econhs <- subset( econmath, econhs == 1 )
+no_econhs <- subset( econmath, econhs == 0 )
+
+mean( with_econhs$score )
+mean( no_econhs$score )
+```
+
+**Answer:**
+
+### (iii) Do the findings in part (ii) necessarily tell you anything about the causal effect of taking high school economics on college course performance? Explain.
+
+**Answer:**
+
+### (iv) If you want to obtain a good causal estimate of the effect of taking a high school economics course using the difference in averages, what experiment would you run?
+
+**Answer:**
