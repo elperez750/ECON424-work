@@ -134,11 +134,10 @@ Now it's your turn. In the chunk below, copy the line above and change mean to s
 
 ```{r}
 # Your turn: copy the line above and change mean to sd
-
+sd( bwght$faminc ) * 1000
 ```
 
-**Answer:**
-
+**Answer:** The standard deviation for the family income is 18739.28
 ------------------------------------------------------------------------
 
 ## C3 The data in MEAP01 are for the state of Michigan in the year 2001. Use these data to answer the following questions.
@@ -151,7 +150,7 @@ You can use the summary() command.
 summary( meap01$math4 )
 ```
 
-**Answer:**
+**Answer:** The largest number in math4 is 100 and the smallest is 0. This makes sense as this is usually the maximum and minimum scores on a test
 
 ### (ii) How many schools have a perfect pass rate on the math test? What percentage is this of the total sample?
 
@@ -164,7 +163,7 @@ sum( meap01$math4 == 100 ) / length( meap01$math4 ) * 100
 ```
 
 
-**Answer:**
+**Answer:** The number of schools with a perfect pass rate is 38. This only accounts for 2.08 percent of all schools in the dataset.
 
 ### (iv) Compare the average pass rates for the math and reading scores. Which test is harder to pass?
 
@@ -176,10 +175,11 @@ Now it's your turn. In the chunk below, copy the line above and change math4 to 
 
 ```{r}
 # Your turn: copy the line above and change math4 to read4
+mean( meap01$read4 )
 
 ```
 
-**Answer:**
+**Answer:** According to the average test scores for both, the reading test is harder to pass
 
 ### (v) Find the correlation between *math4* and *read4*. What do you conclude?
 
@@ -189,7 +189,7 @@ Correlation command is cor().
 cor( meap01$math4, meap01$read4 )
 ```
 
-**Answer:**
+**Answer:** The correlation of the math and reading scores is 0.84, meaning that they are strongly correlated and those who do well on one of them is likely to do well on the other test.
 
 ### (vii) Suppose School A spends \$6,000 per student and School B spends \$5,500 per student. By what percentage does School A's spending exceed School B's? Compare this to 100[log(6,000)-log(5,500)], which is the approximation percentage difference based on the difference in the natural logs.
 
@@ -201,7 +201,7 @@ The first line below calculates the exact percentage difference. In R the comman
 100 * ( log(6000) - log(5500) )
 ```
 
-**Answer:**
+**Answer:** The spending for school A exceeds the spending for school B by 9.09%. This is close to the log approximation, which is 8.70%
 
 ------------------------------------------------------------------------
 
@@ -215,7 +215,7 @@ The variable *train* is binary (1 if the man received job training, 0 if not), s
 mean( jtrain2$train )
 ```
 
-**Answer:**
+**Answer:** The percentage of men that received training is 41 percent.
 
 ### (ii) The variable *re78* is earnings from 1978, measured in thousands of 1982 dollars. Find the averages of *re78* for the sample of men receiving job training and the sample not receiving job training. Is the difference economically large?
 
@@ -235,7 +235,7 @@ mean( not_trained$re78 )
 ```
 
 
-**Answer:**
+**Answer:** The average earnings of men in 1978 who receive job training is 6.35 while the average of earnings of men who do not receive job training is 4.55.
 
 ### (iii) The variable *unem78* is an indicator of whether a man is unemployed or not in 1978. What fraction of the men who received job training are unemployed? What about for men who did not receive job training? Comment on the difference.
 
@@ -249,14 +249,15 @@ Now it's your turn. In the chunk below, copy the line above and change trained t
 
 ```{r}
 # Your turn: copy the line above and change trained to not_trained
+mean( not_trained$unem78)
 
 ```
 
-**Answer:**
+**Answer:** The fraction of men that receive job training that are unemployed is 0.24 while th e fraction of men that do not receive job training and that are unemployed is 0.35
 
 ### (iv) From parts (ii) and (iii), does it appear that the job training program was effective? What would make our conclusions more convincing?
 
-**Answer:**
+**Answer:** From the previous parts, it seems that job training does have a correlation when it comes to better average salaries and better employment rates. Our studies would be more convincing if we were able to find other variables that are related to better outcomes for people with job training. 
 
 ------------------------------------------------------------------------
 
@@ -275,12 +276,12 @@ length( countymurders96$countyid )
 
 countymurders96 |> count( murders == 0 )
 
-mean( countymurders96$execs == 0 )
+mean( countymurders96$execs == 0 ) * 100
 ```
 
 The last line uses a handy trick: *execs == 0* is TRUE (1) or FALSE (0) for each county, and the average of a variable that only takes the values 0 and 1 is the proportion of 1's. So its mean is the proportion of counties with zero executions. Multiply by 100 to get a percentage.
 
-**Answer:**
+**Answer:** The amount of counties in the 1996 data is 2197. Out of those, only 1051 had 0 murders. The percentage of counties that have 0 executions 98 percent of counties
 
 ### (ii) What is the largest number of murders? What is the largest number of executions? Why is the average number of executions so small?
 
@@ -288,9 +289,11 @@ The last line uses a handy trick: *execs == 0* is TRUE (1) or FALSE (0) for each
 max( countymurders96$murders )
 
 max( countymurders96$execs )
+
+mean(countymurders96$execs)
 ```
 
-**Answer:**
+**Answer:** The largest number of murders in a county in 1996 was 1403. The largest number of executions in a county in 1996 was 3. The average number of executions is so small since the majority of counties do not do executions, as we saw that 98 percent of counties have not had an execution from the last problem.
 
 ### (iii) Compute the correlation coefficient between *murders* and *execs* and describe what you find.
 
@@ -298,11 +301,12 @@ max( countymurders96$execs )
 cor( countymurders96$murders, countymurders96$execs )
 ```
 
-**Answer:**
+**Answer:** The correlation between murders and executions is 0.210, which is low and implies that there is not a very strong relationship between murders and executions
 
 ### (iv) You should have computed a positive correlation in part (iii). Do you think that more executions *cause* more murders to occur? What might explain the positive correlation?
 
-**Answer:**
+**Answer:** There seems to be a reverse causality here. More people committing murders would lead to more people getting the death penalty and driving up executions.
+
 
 ------------------------------------------------------------------------
 
@@ -313,9 +317,10 @@ cor( countymurders96$murders, countymurders96$execs )
 ```{r}
 length(econmath$score)
 sum(econmath$econhs)
+
 ```
 
-**Answer:**
+**Answer:** The amount of students in the sample is 856. There are 317 people that reported taking an economics course in high school
 
 ### (ii) Find the average of *score* for those students who did take a high school economics class. How does it compare with the average of *score* for those who did not?
 
@@ -325,14 +330,19 @@ no_econhs <- subset( econmath, econhs == 0 )
 
 mean( with_econhs$score )
 mean( no_econhs$score )
+
+
+
 ```
 
-**Answer:**
+**Answer:** The average score for someone that took Econ in high school is 72.08. The average score for the students whom did not take econ was 72.91.
 
 ### (iii) Do the findings in part (ii) necessarily tell you anything about the causal effect of taking high school economics on college course performance? Explain.
 
-**Answer:**
+**Answer:** The findings from the previous part do not tell us anything about the causal effect of taking high school economics since the average scores are very similar. It is also not reliable since students choose to take economics in high school, which might suggest some interest in the course.We also do not factor in the students relative motivation when it comes to studying in general.
 
 ### (iv) If you want to obtain a good causal estimate of the effect of taking a high school economics course using the difference in averages, what experiment would you run?
 
-**Answer:**
+**Answer:** The experiment I would run is to randomly assign a group of students to high school economics, and for the rest of the students I would not have them taking it. This is more reliable as we won't have to worry about people choosing economics on their own.
+
+
