@@ -134,10 +134,10 @@ Now it's your turn. In the chunk below, copy the line above and change mean to s
 
 ```{r}
 # Your turn: copy the line above and change mean to sd
-
+sd(bwght$faminc) * 1000
 ```
 
-**Answer:**
+**Answer:** The standard deviation for the average family income is 18739.28
 
 ------------------------------------------------------------------------
 
@@ -163,7 +163,6 @@ meap01 |> count( math4 == 100 )
 sum( meap01$math4 == 100 ) / length( meap01$math4 ) * 100
 ```
 
-
 **Answer:**
 
 ### (iv) Compare the average pass rates for the math and reading scores. Which test is harder to pass?
@@ -176,10 +175,10 @@ Now it's your turn. In the chunk below, copy the line above and change math4 to 
 
 ```{r}
 # Your turn: copy the line above and change math4 to read4
-
+mean ( meap01$read4 )
 ```
 
-**Answer:**
+**Answer:** The 
 
 ### (v) Find the correlation between *math4* and *read4*. What do you conclude?
 
@@ -233,7 +232,6 @@ mean( trained$re78 )
 
 mean( not_trained$re78 )
 ```
-
 
 **Answer:**
 

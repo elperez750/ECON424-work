@@ -1,0 +1,235 @@
+---
+title: "ECON 424 Chapter 2 Computer Exercises"
+author: John Doe
+date: "Wednesday, October 14, 2026"
+output: word_document
+---
+
+*Before you knit, replace "John Doe" in the header above with your own name. Type your answers after each* **Answer:** *line.*
+
+*Exercise and part numbers follow Wooldridge's Chapter 2 computer exercises; some are skipped.*
+
+```{r message=F, warning=F, error=F}
+library(wooldridge)
+library(dplyr)
+```
+
+## C1
+
+The data in K401K are a subset of data analyzed by Papke (1995) to study the relationship between participation in a 401(k) pension plan and the generosity of the plan. The variable *prate* is the percentage of eligible workers with an active account; this is the variable we would like to explain. The measure of generosity is the plan match rate, *mrate*. This variable gives the average amount the firm contributes to each worker's plan for each \$1 contribution by the worker. For example, if *mrate* is 0.50, then a \$1 contribution by the worker is matched by a 50¢ contribution by the firm.
+
+*C1 is a worked example for parts (i) and (ii). Parts (iii) through (v) are yours.*
+
+### (i) Find the average participation rate and the average match rate in the sample of plans.
+
+```{r}
+mean( k401k$prate )
+mean( k401k$mrate )
+```
+
+**Answer:** The average participation rate is `r sprintf( "%.2f", mean( k401k$prate ) )` percent, and the average match rate is `r sprintf( "%.2f", mean( k401k$mrate ) )`, meaning the average firm contributes about `r round( 100 * mean( k401k$mrate ) )`¢ for each \$1 a worker contributes.
+
+### (ii) Now, estimate the simple regression equation $\widehat{prate}=\hat{\beta}_{0}+\hat{\beta}_{1}mrate$, and report the results along with the sample size and *R*-squared.
+
+The lm() command runs a regression. The part before the ~ is the dependent variable (*y*), and the part after it is the independent variable (*x*). We save the results under the name reg1, then use summary() to see them.
+
+```{r}
+reg1 <- lm( prate ~ mrate, data = k401k )
+summary( reg1 )
+nobs( reg1 )
+```
+
+In the summary output, the estimates are in the "Estimate" column: the first row, (Intercept), is $\hat{\beta}_{0}$, and the row labeled mrate is $\hat{\beta}_{1}$. *R*-squared is on the line labeled "Multiple R-squared." nobs() gives the number of observations, *n*.
+
+**Answer:** $\widehat{prate}$ = `r sprintf( "%.2f", coef( reg1 )[1] )` + `r sprintf( "%.2f", coef( reg1 )[2] )` *mrate*, with *n* = `r format( nobs( reg1 ), big.mark = "," )` and *R*-squared = `r sprintf( "%.3f", summary( reg1 )$r.squared )`.
+
+### (iii) Interpret the intercept in your equation. Interpret the coefficient on *mrate*.
+
+**Answer:**
+
+### (iv) Find the predicted *prate* when *mrate* = 3.5. Is this a reasonable prediction? Explain what is happening here.
+
+To predict, plug *mrate* = 3.5 into the estimated equation. coef( reg1 )[1] is the intercept, and coef( reg1 )[2] is the slope.
+
+```{r}
+coef( reg1 )[1] + coef( reg1 )[2] * 3.5
+```
+
+**Answer:**
+
+### (v) How much of the variation in *prate* is explained by *mrate*? Is this a lot in your opinion?
+
+Look at the "Multiple R-squared" line in the summary output from part (ii).
+
+**Answer:**
+
+------------------------------------------------------------------------
+
+## C2 The data set in CEOSAL2 contains information on chief executive officers for U.S. corporations. The variable *salary* is annual compensation, in thousands of dollars, and *ceoten* is prior number of years as company CEO.
+
+### (i) Find the average salary and the average tenure in the sample.
+
+```{r}
+mean( ceosal2$salary )
+```
+
+Now it's your turn. In the chunk below, copy the line above and change salary to ceoten.
+
+```{r}
+# Your turn: copy the line above and change salary to ceoten
+
+```
+
+**Answer:**
+
+### (ii) How many CEOs are in their first year as CEO (that is, *ceoten* = 0)? What is the longest tenure as a CEO?
+
+```{r}
+ceosal2 |> count( ceoten == 0 )
+
+max( ceosal2$ceoten )
+```
+
+**Answer:**
+
+### (iii) Estimate the simple regression model $log(salary)=\beta_{0}+\beta_{1}ceoten+u$. What is the (approximate) predicted percentage increase in salary given one more year as a CEO?
+
+Putting log() around the dependent variable tells R to use the natural log of *salary*.
+
+```{r}
+reg2 <- lm( log(salary) ~ ceoten, data = ceosal2 )
+summary( reg2 )
+nobs( reg2 )
+```
+
+*Fill in the four numbers below, then answer the question.*
+
+**Intercept** ($\hat{\beta}_{0}$):
+
+**Slope** ($\hat{\beta}_{1}$):
+
+***n*:**
+
+***R*-squared:**
+
+When the dependent variable is in logs, multiply the slope by 100 to get the approximate percentage change in *y* for a one-unit increase in *x*.
+
+**Answer:**
+
+------------------------------------------------------------------------
+
+## C4 Use the data in WAGE2 to estimate a simple regression explaining monthly salary (*wage*) in terms of IQ score (*IQ*).
+
+### (i) Find the average salary and average IQ in the sample. What is the sample standard deviation of IQ? (IQ scores are standardized so that the average in the population is 100 with a standard deviation equal to 15.)
+
+```{r}
+mean( wage2$wage )
+mean( wage2$IQ )
+sd( wage2$IQ )
+```
+
+**Answer:**
+
+### (ii) Estimate a simple regression model where a one-point increase in *IQ* changes *wage* by a constant dollar amount. Use this model to find the predicted increase in wage for an increase in IQ of 15 points. Does IQ explain most of the variation in wage?
+
+```{r}
+reg3 <- lm( wage ~ IQ, data = wage2 )
+summary( reg3 )
+
+15 * coef( reg3 )[2]
+```
+
+**Answer:**
+
+### (iii) Now, estimate a model where each one-point increase in *IQ* has the same percentage effect on *wage*. If *IQ* increases by 15 points, what is the approximate percentage increase in predicted *wage*?
+
+A constant percentage effect means putting *wage* in logs, just like *salary* in C2(iii). In the chunk below, copy the reg3 line from part (ii), change wage to log(wage), and change the name reg3 to reg4. Then add a line that runs summary( reg4 ).
+
+```{r}
+# Your turn: copy the reg3 line, change wage to log(wage), and name it reg4
+# Then add: summary( reg4 )
+
+```
+
+To get the approximate percentage effect of 15 points, multiply the slope by 100, then by 15.
+
+**Answer:**
+
+------------------------------------------------------------------------
+
+## C10 The data set in CATHOLIC includes test score information on over 7,000 students in the United States who were in eighth grade in 1988. The variables *math12* and *read12* are scores on twelfth grade standardized math and reading tests, respectively.
+
+### (i) How many students are in the sample? Find the means and standard deviations of *math12* and *read12*.
+
+```{r}
+nrow( catholic )
+
+mean( catholic$math12 )
+sd( catholic$math12 )
+```
+
+Now it's your turn. In the chunk below, copy the two lines above and change math12 to read12.
+
+```{r}
+# Your turn: copy the mean and sd lines above and change math12 to read12
+
+```
+
+**Answer:**
+
+### (ii) Run the simple regression of *math12* on *read12* to obtain the OLS intercept and slope estimates.
+
+This time, write the regression code yourself. Some hints:
+
+* Use lm(), just like reg1 in C1(ii) and reg3 in C4(ii).
+* The dependent variable goes **before** the ~ and the independent variable goes **after** it. "Regress *math12* on *read12*" means *math12* is the dependent variable.
+* The data set is catholic, so use data = catholic.
+* Save the results as reg5, then use summary( reg5 ) to see the estimates and *R*-squared, and nobs( reg5 ) to get *n*.
+
+```{r}
+# Your turn: write the regression of math12 on read12, saved as reg5
+# Then add: summary( reg5 ) and nobs( reg5 )
+
+```
+
+*Fill in the four numbers below.*
+
+**Intercept** ($\hat{\beta}_{0}$):
+
+**Slope** ($\hat{\beta}_{1}$):
+
+***n*:**
+
+***R*-squared:**
+
+### (iii) Does the intercept reported in part (ii) have a meaningful interpretation? Explain.
+
+It may help to know the lowest reading score in the sample.
+
+```{r}
+min( catholic$read12 )
+```
+
+**Answer:**
+
+### (iv) Are you surprised by the $\hat{\beta}_{1}$ that you found? What about $R^{2}$?
+
+**Answer:**
+
+### (v) Suppose that you present your findings to a superintendent of a school district, and the superintendent says, "Your findings show that to improve math scores we just need to improve reading scores, so we should hire more reading tutors." How would you respond to this comment? (Hint: If you instead run the regression of *read12* on *math12*, what would you expect to find?)
+
+*Step 1: Predict before you run anything.* If you regress *read12* on *math12* instead, do you expect the slope to be positive or negative? Bigger or smaller than the slope you found in part (ii)?
+
+**Prediction:**
+
+*Step 2: Run it.* Copy your reg5 line from part (ii), switch math12 and read12, and call the result reg6. Then add a line that runs summary( reg6 ).
+
+```{r}
+# Your turn: copy your reg5 line, switch math12 and read12, and name it reg6
+# Then add: summary( reg6 )
+
+```
+
+*Step 3: Answer the superintendent.* Was your prediction right? What does the switched regression tell you about the superintendent's argument?
+
+**Answer:**
