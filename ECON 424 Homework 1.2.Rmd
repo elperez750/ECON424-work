@@ -134,10 +134,18 @@ Now it's your turn. In the chunk below, copy the line above and change mean to s
 
 ```{r}
 # Your turn: copy the line above and change mean to sd
+<<<<<<< HEAD
 sd( bwght$faminc ) * 1000
 ```
 
 **Answer:** The standard deviation for the family income is 18739.28
+=======
+sd(bwght$faminc) * 1000
+```
+
+**Answer:** The standard deviation for the average family income is 18739.28
+
+>>>>>>> 9559b91d83bf454abc1c24c16b801a887be37c24
 ------------------------------------------------------------------------
 
 ## C3 The data in MEAP01 are for the state of Michigan in the year 2001. Use these data to answer the following questions.
@@ -162,8 +170,12 @@ meap01 |> count( math4 == 100 )
 sum( meap01$math4 == 100 ) / length( meap01$math4 ) * 100
 ```
 
+<<<<<<< HEAD
 
 **Answer:** The number of schools with a perfect pass rate is 38. This only accounts for 2.08 percent of all schools in the dataset.
+=======
+**Answer:**
+>>>>>>> 9559b91d83bf454abc1c24c16b801a887be37c24
 
 ### (iv) Compare the average pass rates for the math and reading scores. Which test is harder to pass?
 
@@ -175,11 +187,18 @@ Now it's your turn. In the chunk below, copy the line above and change math4 to 
 
 ```{r}
 # Your turn: copy the line above and change math4 to read4
+<<<<<<< HEAD
 mean( meap01$read4 )
 
 ```
 
 **Answer:** According to the average test scores for both, the reading test is harder to pass
+=======
+mean ( meap01$read4 )
+```
+
+**Answer:** The 
+>>>>>>> 9559b91d83bf454abc1c24c16b801a887be37c24
 
 ### (v) Find the correlation between *math4* and *read4*. What do you conclude?
 
@@ -234,8 +253,12 @@ mean( trained$re78 )
 mean( not_trained$re78 )
 ```
 
+<<<<<<< HEAD
 
 **Answer:** The average earnings of men in 1978 who receive job training is 6.35 while the average of earnings of men who do not receive job training is 4.55.
+=======
+**Answer:**
+>>>>>>> 9559b91d83bf454abc1c24c16b801a887be37c24
 
 ### (iii) The variable *unem78* is an indicator of whether a man is unemployed or not in 1978. What fraction of the men who received job training are unemployed? What about for men who did not receive job training? Comment on the difference.
 
