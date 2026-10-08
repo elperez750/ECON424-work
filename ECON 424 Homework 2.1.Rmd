@@ -126,6 +126,7 @@ When the dependent variable is in logs, multiply the slope by 100 to get the app
 ```{r}
 mean( wage2$wage )
 mean( wage2$IQ )
+?wage2
 sd( wage2$IQ )
 ```
 
@@ -176,6 +177,8 @@ Now it's your turn. In the chunk below, copy the two lines above and change math
 
 ```{r}
 # Your turn: copy the mean and sd lines above and change math12 to read12
+mean( catholic$read12 )
+sd( catholic$ read12 )
 
 ```
 
@@ -193,18 +196,22 @@ This time, write the regression code yourself. Some hints:
 ```{r}
 # Your turn: write the regression of math12 on read12, saved as reg5
 # Then add: summary( reg5 ) and nobs( reg5 )
+reg5 <- lm(math12 ~ read12, data=catholic)
+summary(reg5)
+
+nobs(reg5)
 
 ```
 
 *Fill in the four numbers below.*
 
-**Intercept** ($\hat{\beta}_{0}$):
+**Intercept** ($\hat{\beta}_{0}$): 15.15
 
-**Slope** ($\hat{\beta}_{1}$):
+**Slope** ($\hat{\beta}_{1}$): 0.71
 
-***n*****:**
+***n*****: 7430**
 
-***R*****-squared:**
+***R*****-squared: 0.50**
 
 ### (iii) Does the intercept reported in part (ii) have a meaningful interpretation? Explain.
 
@@ -214,7 +221,7 @@ It may help to know the lowest reading score in the sample.
 min( catholic$read12 )
 ```
 
-**Answer:**
+**Answer: The intercept here does not have a meaningful interpretation. This is because when we set the math score to 0, we find that that average score for reading would be 15.15, which is lower than the lowest score in the data set, rendering our intercept useless for meaningful analysis.**
 
 ### (iv) Are you surprised by the $\hat{\beta}_{1}$ that you found? What about $R^{2}$?
 
