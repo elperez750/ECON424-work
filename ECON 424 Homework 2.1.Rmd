@@ -1,6 +1,6 @@
 ---
 title: "ECON 424 Chapter 2 Computer Exercises"
-author: John Doe
+author: Elliott Perez Ramos
 date: "Wednesday, October 14, 2026"
 output: word_document
 ---
@@ -31,7 +31,7 @@ mean( k401k$mrate )
 
 ### (ii) Now, estimate the simple regression equation $\widehat{prate}=\hat{\beta}_{0}+\hat{\beta}_{1}mrate$, and report the results along with the sample size and *R*-squared.
 
-The lm() command runs a regression. The part before the ~ is the dependent variable (*y*), and the part after it is the independent variable (*x*). We save the results under the name reg1, then use summary() to see them.
+The lm() command runs a regression. The part before the \~ is the dependent variable (*y*), and the part after it is the independent variable (*x*). We save the results under the name reg1, then use summary() to see them.
 
 ```{r}
 reg1 <- lm( prate ~ mrate, data = k401k )
@@ -45,7 +45,7 @@ In the summary output, the estimates are in the "Estimate" column: the first row
 
 ### (iii) Interpret the intercept in your equation. Interpret the coefficient on *mrate*.
 
-**Answer:**
+**Answer: The intercept of the equation represents the prate when the mrate is 0. The coefficient on mrate represents the the change in prate when the mrate goes up by one percent on average**
 
 ### (iv) Find the predicted *prate* when *mrate* = 3.5. Is this a reasonable prediction? Explain what is happening here.
 
@@ -55,13 +55,13 @@ To predict, plug *mrate* = 3.5 into the estimated equation. coef( reg1 )[1] is t
 coef( reg1 )[1] + coef( reg1 )[2] * 3.5
 ```
 
-**Answer:**
+**Answer: This is not a reasonable prediction as the prate exceeds 100, meaning it represents more than the employees that are at the company. This is not a logical answer.**
 
 ### (v) How much of the variation in *prate* is explained by *mrate*? Is this a lot in your opinion?
 
 Look at the "Multiple R-squared" line in the summary output from part (ii).
 
-**Answer:**
+**Answer: 0.0747 is variation between prate and mrate. This is not a lot and means that a little of the variation in the prate is captures by the variation of the estimated prate**
 
 ------------------------------------------------------------------------
 
@@ -77,7 +77,8 @@ Now it's your turn. In the chunk below, copy the line above and change salary to
 
 ```{r}
 # Your turn: copy the line above and change salary to ceoten
-
+mean( ceosal2$ceoten)
+?ceosal2
 ```
 
 **Answer:**
@@ -90,7 +91,7 @@ ceosal2 |> count( ceoten == 0 )
 max( ceosal2$ceoten )
 ```
 
-**Answer:**
+**Answer: The amount of CEOs that are in their first year are 5. The longest tenured CEO has been CEO for 37 years.**
 
 ### (iii) Estimate the simple regression model $log(salary)=\beta_{0}+\beta_{1}ceoten+u$. What is the (approximate) predicted percentage increase in salary given one more year as a CEO?
 
@@ -104,17 +105,17 @@ nobs( reg2 )
 
 *Fill in the four numbers below, then answer the question.*
 
-**Intercept** ($\hat{\beta}_{0}$):
+**Intercept** ($\hat{\beta}_{0}$): 6.51
 
-**Slope** ($\hat{\beta}_{1}$):
+**Slope** ($\hat{\beta}_{1}$): 0.01
 
-***n*:**
+***n*****: 177**
 
-***R*-squared:**
+***R*****-squared: 0.01**
 
 When the dependent variable is in logs, multiply the slope by 100 to get the approximate percentage change in *y* for a one-unit increase in *x*.
 
-**Answer:**
+**Answer: The slope coefficient is 1. Meaning that for each year being CEO, the salary will increase by 1 percent**
 
 ------------------------------------------------------------------------
 
@@ -128,7 +129,7 @@ mean( wage2$IQ )
 sd( wage2$IQ )
 ```
 
-**Answer:**
+**Answer: The average salary is 957.95 and the average IQ is 101.28. The sample standard deviation of IQ is 15.05.**
 
 ### (ii) Estimate a simple regression model where a one-point increase in *IQ* changes *wage* by a constant dollar amount. Use this model to find the predicted increase in wage for an increase in IQ of 15 points. Does IQ explain most of the variation in wage?
 
@@ -139,7 +140,7 @@ summary( reg3 )
 15 * coef( reg3 )[2]
 ```
 
-**Answer:**
+**Answer: The predicted increase in wage with an increase of 15 IQ points turns out to be 124.55 dollars. IQ does not explain most of the variation in y (wage), as the R\^2 value ends up being 0.1**
 
 ### (iii) Now, estimate a model where each one-point increase in *IQ* has the same percentage effect on *wage*. If *IQ* increases by 15 points, what is the approximate percentage increase in predicted *wage*?
 
@@ -148,12 +149,15 @@ A constant percentage effect means putting *wage* in logs, just like *salary* in
 ```{r}
 # Your turn: copy the reg3 line, change wage to log(wage), and name it reg4
 # Then add: summary( reg4 )
+reg4 <- lm( log(wage) ~ IQ, data = wage2 )
+summary( reg4 )
 
+(15 * (coef( reg4 )[2] * 100))
 ```
 
 To get the approximate percentage effect of 15 points, multiply the slope by 100, then by 15.
 
-**Answer:**
+**Answer: The approximate percentage effect of a 15 point IQ change is 13 percent on average. Meaning the wage will go up by 13 percent for a 15 point change.**
 
 ------------------------------------------------------------------------
 
@@ -181,10 +185,10 @@ Now it's your turn. In the chunk below, copy the two lines above and change math
 
 This time, write the regression code yourself. Some hints:
 
-* Use lm(), just like reg1 in C1(ii) and reg3 in C4(ii).
-* The dependent variable goes **before** the ~ and the independent variable goes **after** it. "Regress *math12* on *read12*" means *math12* is the dependent variable.
-* The data set is catholic, so use data = catholic.
-* Save the results as reg5, then use summary( reg5 ) to see the estimates and *R*-squared, and nobs( reg5 ) to get *n*.
+- Use lm(), just like reg1 in C1(ii) and reg3 in C4(ii).
+- The dependent variable goes **before** the \~ and the independent variable goes **after** it. "Regress *math12* on *read12*" means *math12* is the dependent variable.
+- The data set is catholic, so use data = catholic.
+- Save the results as reg5, then use summary( reg5 ) to see the estimates and *R*-squared, and nobs( reg5 ) to get *n*.
 
 ```{r}
 # Your turn: write the regression of math12 on read12, saved as reg5
@@ -198,9 +202,9 @@ This time, write the regression code yourself. Some hints:
 
 **Slope** ($\hat{\beta}_{1}$):
 
-***n*:**
+***n*****:**
 
-***R*-squared:**
+***R*****-squared:**
 
 ### (iii) Does the intercept reported in part (ii) have a meaningful interpretation? Explain.
 
