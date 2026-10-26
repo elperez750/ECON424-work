@@ -103,7 +103,7 @@ summary( reg4 )
 
 ```
 
-**Answer:**
+**Answer: When we add prppov to the linear regression, we see that our slope for prpblck is `r coef(reg4["prpblck"])`** , which is smaller than our slope that we had before, which was `r coef(reg3["prpblck"])`
 
 ### (vi) Find the correlation between $\log(income)$ and *prppov*. Is it roughly what you expected?
 
@@ -113,13 +113,13 @@ use = "complete.obs" tells cor() to skip ZIP codes with missing values, just lik
 cor( log( discrim$income ), discrim$prppov, use = "complete.obs" )
 ```
 
-**Answer:**
+**Answer: The correlation is -0.83 which is exactly what I expected since as the proportion of zipcodes in poverty increase, the more wages tend to go down.**
 
 ### (vii) Evaluate the following statement: "Because $\log(income)$ and *prppov* are so highly correlated, they have no business being in the same regression."
 
 *Hint:* What would happen to the estimate on *prpblck* if you dropped one of them? Does high correlation between two control variables make the OLS estimates biased?
 
-**Answer:**
+**Answer: The following statement is misguided. Since they are so highly correlated, dropping one of the terms will make the other term biased and result in the coefficient one the term that was not dropped either increase or decrease depending on how they were correlated.**
 
 ------------------------------------------------------------------------
 
@@ -132,15 +132,20 @@ Use the data in HTV to answer this question. The data set includes information o
 range() gives the smallest and largest values. mean( htv\$educ == 12 ) gives the proportion of men with exactly 12 years of education (multiply by 100 for a percentage).
 
 ```{r}
+# The smallest and the biggest educations here
 range( htv$educ )
+
+
+# 41 percent of men completed schooling up to 12th grade.
 mean( htv$educ == 12 )
+
 
 mean( htv$educ )
 mean( htv$motheduc )
 mean( htv$fatheduc )
 ```
 
-**Answer:**
+**Answer: The years of schooling for men ranges from 6 years to 20 years of schooling. the percentage of men that have only completed schooling up to 12th grade is about 42 percent. On average, the men have about an average of 13.0374 years of schooling, which is about one more yearr than both their father and their mother.**
 
 ### (ii) Estimate the regression model $educ=\beta_{0}+\beta_{1}motheduc+\beta_{2}fatheduc+u$ by OLS and report the results in the usual form. How much sample variation in *educ* is explained by parents' education? Interpret the coefficient on *motheduc*.
 
@@ -152,17 +157,17 @@ nobs( reg5 )
 
 *Fill in the numbers below, then answer the questions.*
 
-**Intercept** ($\hat{\beta}_{0}$):
+**Intercept** ($\hat{\beta}_{0}$): 6.96435
 
-**Coefficient on *motheduc*** ($\hat{\beta}_{1}$):
+**Coefficient on *motheduc*** ($\hat{\beta}_{1}$): 0.30420
 
-**Coefficient on *fatheduc*** ($\hat{\beta}_{2}$):
+**Coefficient on *fatheduc*** ($\hat{\beta}_{2}$): 0.19029
 
-***n*****:**
+***n*****: 1230**
 
-***R*****-squared:**
+***R*****-squared: 0.2493**
 
-**Answer:**
+**Answer: The variation in education that is explained that is explained by parents education is about 25 percent, which means that 75 percent of the variation comes from other factors.**
 
 ### (iii) Add the variable *abil* (a measure of cognitive ability) to the regression from part (ii), and report the results in equation form. Does "ability" help to explain variations in education, even after controlling for parents' education? Explain.
 
