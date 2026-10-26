@@ -1,0 +1,197 @@
+---
+title: "ECON 424 - Multiple Regression Analysis: Problems Worksheet"
+author: "Your Name"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+    number_sections: true
+  html_document:
+    toc: true
+    df_print: paged
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+# Install wooldridge package if needed:
+install.packages(c("wooldridge", "tidyverse", "car"))
+library(wooldridge)
+library(tidyverse)
+library(car)
+```
+
+# Problem 1: College GPA and High School Percentile
+
+Using the `gpa2` data on 4,137 college students:
+
+$$\widehat{colgpa} = 1.392 - 0.0135\,hsperc + 0.00148\,sat$$
+$$n = 4{,}137, \quad R^2 = 0.273$$
+
+where $colgpa$ is on a 4.0 scale, $hsperc$ is percentile in the
+graduating class ($hsperc = 5$ means top 5%), and $sat$ is combined SAT.
+
+## Conceptual & Numerical Questions
+
+1.  **Why does it make sense for the coefficient on** $hsperc$ to be
+    negative?\
+    *Answer: It would make sense for the hsperc to be negative since the
+    greater that hsperc grows, the lower the percentile that the student
+    is in is. When you are in the top 1 percentile, that is obviously
+    better than being in the 60th percentile for example*
+
+2.  **Compute predicted college GPA when** $hsperc = 20$ and
+    $sat = 1050$.
+
+```{r p1_calc}
+# Calculate predicted colgpa
+b0 <- 1.392
+b1 <- 0.0135
+b2 <- 
+
+```
+
+3.  **Student A and B have the same** $hsperc$, but Student A has a
+    140-point higher SAT score. What is the predicted GPA difference? Is
+    it economically large?\
+    *Answer:*
+
+4.  **Holding** $hsperc$ fixed, what difference in SAT scores yields a
+    predicted GPA difference of 0.50 grade points?
+
+```{r p1_diff}
+# sat_diff = delta_y / b2
+sat_diff <- 0.50 / b2
+sat_diff
+```
+
+------------------------------------------------------------------------
+
+# Problem 2: Education and Family Background
+
+Using the `wage2` data:
+
+$$\widehat{educ} = 10.36 - 0.094\,sibs + 0.131\,meduc + 0.210\,feduc$$
+$$n = 722, \quad R^2 = 0.214$$
+
+## Empirical Verification & Questions
+
+```{r p2_model}
+data("wage2")
+mod_educ <- lm(educ ~ sibs + meduc + feduc, data = wage2)
+summary(mod_educ)
+```
+
+1.  **Holding parental education fixed, how much must** $sibs$ increase
+    to reduce predicted schooling by 1 year?
+
+```{r p2_sibs}
+# 1 / |coef_sibs|
+abs(1 / coef(mod_educ)["sibs"])
+```
+
+2.  **Interpret the coefficient on** $meduc$.\
+    *Answer:*
+
+3.  **Compare Man A (**$sibs = 0, meduc = 12, feduc = 12$) and Man B
+    ($sibs = 0, meduc = 16, feduc = 16$). What is the predicted
+    difference in years of education?
+
+```{r p2_prediction}
+diff_educ <- (coef(mod_educ)["meduc"] + coef(mod_educ)["feduc"]) * (16 - 12)
+diff_educ
+```
+
+------------------------------------------------------------------------
+
+# Problem 3: Sleep vs. Work Tradeoff
+
+Using `sleep75`:
+
+$$\widehat{sleep} = 3{,}638.25 - 0.148\,totwrk - 11.13\,educ + 2.20\,age$$
+$$n = 706, \quad R^2 = 0.113$$
+
+where $sleep$ and $totwrk$ are measured in minutes per week.
+
+```{r p3_model}
+data("sleep75")
+mod_sleep <- lm(sleep ~ totwrk + educ + age, data = sleep75)
+summary(mod_sleep)
+```
+
+1.  **If someone works 5 additional hours per week, by how many minutes
+    is sleep predicted to fall? Is this a 1-for-1 trade-off?**
+
+```{r p3_tradeoff}
+hours_added <- 5
+mins_added <- hours_added * 60
+sleep_drop <- coef(mod_sleep)["totwrk"] * mins_added
+sleep_drop
+```
+
+------------------------------------------------------------------------
+
+# Problem 4: Multicollinearity and Standard Errors
+
+Consider MLB salaries (`mlb1`) estimating simple vs. multiple
+regressions:
+
+$$\text{Model 1: } \log(salary) = \beta_0 + \beta_1 years + u$$
+$$\text{Model 2: } \log(salary) = \beta_0 + \beta_1 years + \beta_2 rbisyr + u$$
+
+```{r p4_models}
+data("mlb1")
+
+m1 <- lm(log(salary) ~ years, data = mlb1)
+m2 <- lm(log(salary) ~ years + rbisyr, data = mlb1)
+
+summary(m1)
+summary(m2)
+```
+
+## VIF and Standard Error Trade-Off
+
+Recall the variance formula:
+$$se(\hat{\beta}_1) = \frac{\hat{\sigma}}{\sqrt{SST_1}} \cdot \sqrt{VIF_1}$$
+
+```{r p4_vif}
+# Variance Inflation Factor
+car::vif(m2)
+
+# Residual standard error comparison
+summary(m1)$sigma
+summary(m2)$sigma
+```
+
+1.  **Why does** $se(\hat{\beta}_1)$ drop in the multiple regression
+    even though $years$ and $rbisyr$ are positively correlated
+    ($r \approx 0.487$)?\
+    *Answer:*
+
+------------------------------------------------------------------------
+
+# Problem 5: Omitted Variable Bias Derivation
+
+Let the true population model be:
+$$y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + u$$
+
+Suppose we omit $x_3$ and regress $y$ on $x_1$ and $x_2$, obtaining
+$\tilde{\beta}_1$.
+
+## Derivation Steps
+
+By Frisch-Waugh-Lovell:
+$$\tilde{\beta}_1 = \frac{\sum \hat{r}_{i1} y_i}{\sum \hat{r}_{i1}^2}$$
+where $\hat{r}_{i1}$ are residuals from regressing $x_1$ on $x_2$.
+
+Substitute
+$y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \beta_3 x_{i3} + u_i$:
+
+1.  Note that $\sum \hat{r}_{i1} = 0$, $\sum \hat{r}_{i1} x_{i2} = 0$,
+    and $\sum \hat{r}_{i1} x_{i1} = \sum \hat{r}_{i1}^2$.
+2.  Take conditional expectations given $\mathbf{X}$:
+    $$E(\tilde{\beta}_1) = \beta_1 + \beta_3 \frac{\sum_{i=1}^n \hat{r}_{i1} x_{i3}}{\sum_{i=1}^n \hat{r}_{i1}^2}$$
+
+Write out the remaining algebraic verification steps below.

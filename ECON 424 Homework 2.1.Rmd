@@ -169,7 +169,11 @@ To get the approximate percentage effect of 15 points, multiply the slope by 100
 ```{r}
 nrow( catholic )
 
+# 52.133
 mean( catholic$math12 )
+
+# 9.46
+# This means that every math score is about 9 away from the mean
 sd( catholic$math12 )
 ```
 
@@ -177,7 +181,12 @@ Now it's your turn. In the chunk below, copy the two lines above and change math
 
 ```{r}
 # Your turn: copy the mean and sd lines above and change math12 to read12
+# 51.77
+# The math score on average is slightly higher
 mean( catholic$read12 )
+
+# 9.41
+# This is similar to the standard deviation for the math score
 sd( catholic$ read12 )
 
 ```
@@ -196,6 +205,8 @@ This time, write the regression code yourself. Some hints:
 ```{r}
 # Your turn: write the regression of math12 on read12, saved as reg5
 # Then add: summary( reg5 ) and nobs( reg5 )
+# math is the independent variable, reading is the dependent variable
+# That means that the score of reading depends on the score of the math test
 reg5 <- lm(math12 ~ read12, data=catholic)
 summary(reg5)
 
@@ -211,7 +222,7 @@ nobs(reg5)
 
 ***n*****: 7430**
 
-***R*****-squared: 0.50**
+***R*****-squared: 0.505**
 
 ### (iii) Does the intercept reported in part (ii) have a meaningful interpretation? Explain.
 
@@ -221,26 +232,29 @@ It may help to know the lowest reading score in the sample.
 min( catholic$read12 )
 ```
 
-**Answer: The intercept here does not have a meaningful interpretation. This is because when we set the math score to 0, we find that that average score for reading would be 15.15, which is lower than the lowest score in the data set, rendering our intercept useless for meaningful analysis.**
+**Answer: The intercept here does not have a meaningful interpretation. This is because when we set the reading score to 0, we find that that average score for math would be 15.15 on average. This is an extrapolation, as we do not have any values in our reading column that are even close to 0. The lowest score was 29.15**
 
-### (iv) Are you surprised by the $\hat{\beta}_{1}$ that you found? What about $R^{2}$?
+(iv) Are you surprised by the $\hat{\beta}_{1}$ that you found? What about $R^{2}$?
 
-**Answer:**
+**Answer: I am sort of surprised by our** 𝛽1 value here. It shows that for every point on the reading test, there is a 0.71 point increase on the math test on average. This combined with an R\^2 value show that they move closely with each other
 
 ### (v) Suppose that you present your findings to a superintendent of a school district, and the superintendent says, "Your findings show that to improve math scores we just need to improve reading scores, so we should hire more reading tutors." How would you respond to this comment? (Hint: If you instead run the regression of *read12* on *math12*, what would you expect to find?)
 
 *Step 1: Predict before you run anything.* If you regress *read12* on *math12* instead, do you expect the slope to be positive or negative? Bigger or smaller than the slope you found in part (ii)?
 
-**Prediction:**
+**Prediction: If we were to regress read12 on math12, I predict that we would probably see probably see a smaller slope for** 𝛽1. that is because since we saw that 1 point in math causes a 0.71 point increase in our reading score on average, that relationship will flip when we flip our independent and dependent variables.
 
 *Step 2: Run it.* Copy your reg5 line from part (ii), switch math12 and read12, and call the result reg6. Then add a line that runs summary( reg6 ).
 
 ```{r}
 # Your turn: copy your reg5 line, switch math12 and read12, and name it reg6
 # Then add: summary( reg6 )
+reg66 <- lm(read12 ~ math12, data=catholic)
+summary(reg5)
 
+nobs(reg5)
 ```
 
 *Step 3: Answer the superintendent.* Was your prediction right? What does the switched regression tell you about the superintendent's argument?
 
-**Answer:**
+**Answer: In flipping both the dependent and the independent variable, our intercept value and our** $\hat{\beta}_{1}$ are 15.15 and 0.714 respectively, meaning they move pretty close with each other.
