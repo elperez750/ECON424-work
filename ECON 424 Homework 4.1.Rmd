@@ -18,7 +18,7 @@ library(car)
 options( scipen = 64 )
 ```
 
-Chapter 4 is about testing hypotheses. In the summary() output, the "t value" column tests $H_0: \beta_j = 0$ and "Pr(>\|t\|)" is the two-sided p-value for that test. For any other null hypothesis, such as $\beta_j = 1$, you need to compute the t statistic yourself: (estimate $-$ hypothesized value) / standard error.
+Chapter 4 is about testing hypotheses. In the summary() output, the "t value" column tests $H_0: \beta_j = 0$ and "Pr(\>\|t\|)" is the two-sided p-value for that test. For any other null hypothesis, such as $\beta_j = 1$, you need to compute the t statistic yourself: (estimate $-$ hypothesized value) / standard error.
 
 ------------------------------------------------------------------------
 
@@ -32,11 +32,11 @@ In VOTE1, the logs are already computed: log(*expendA*) is *lexpendA* and log(*e
 
 *Hint:* This is a level-log model. Look back at how a 1% change in *x* affects *y* in that case.
 
-**Answer:**
+**Answer: Holding all else equal, a one percent increase in expenditure will result in 1 more vote for candidate A.**
 
 ### (ii) In terms of the parameters, state the null hypothesis that a 1% increase in A's expenditures is offset by a 1% increase in B's expenditures.
 
-**Answer:**
+**Answer: H0: expendA - expendB = 0**
 
 ### (iii) Estimate the given model using the data in VOTE1 and report the results in usual form. Do A's expenditures affect the outcome? What about B's expenditures? Can you use these results to test the hypothesis in part (ii)?
 
@@ -46,7 +46,7 @@ summary( reg1 )
 nobs( reg1 )
 ```
 
-**Answer:**
+**Answer: Looking at the numbers, we can see that expendanture for candidate A will have a positive effect on the number of votes for candidate a. We can also see that the expenditure for candidate B will have a negative effect on the number of votes for candidate A. These results prove the null hypothesis, as we see that the coefficients are very similar to each other, meaning that they practically cancel each other out.**
 
 ### (iv) Estimate a model that directly gives the *t* statistic for testing the hypothesis in part (ii). What do you conclude? (Use a two-sided alternative.)
 
