@@ -1,0 +1,215 @@
+---
+title: "ECON 424 Chapter 4 Computer Exercises"
+author: Elliott Perez
+date: "Wednesday, November 4, 2026"
+output: word_document
+---
+
+*Before you knit, replace "John Doe" in the header above with your own name. Type your answers after each* **Answer:** *line.*
+
+*Exercise and part numbers follow Wooldridge's Chapter 4 computer exercises; some are skipped. C1 has one extra part, (v), that is not in the book.*
+
+This homework uses the car package for F tests. If you have never installed it, run install.packages( "car" ) once in the Console (not in this file) before you knit.
+
+```{r message=F, warning=F, error=F}
+library(wooldridge)
+library(dplyr)
+library(car)
+options( scipen = 64 )
+```
+
+Chapter 4 is about testing hypotheses. In the summary() output, the "t value" column tests $H_0: \beta_j = 0$ and "Pr(>\|t\|)" is the two-sided p-value for that test. For any other null hypothesis, such as $\beta_j = 1$, you need to compute the t statistic yourself: (estimate $-$ hypothesized value) / standard error.
+
+------------------------------------------------------------------------
+
+## C1 (10 points)
+
+The following model can be used to study whether campaign expenditures affect election outcomes: $$voteA=\beta_{0}+\beta_{1}\log(expendA)+\beta_{2}\log(expendB)+\beta_{3}prtystrA+u,$$ where *voteA* is the percentage of the vote received by Candidate A, *expendA* and *expendB* are campaign expenditures by Candidates A and B, and *prtystrA* is a measure of party strength for Candidate A (the percentage of the most recent presidential vote that went to A's party).
+
+In VOTE1, the logs are already computed: log(*expendA*) is *lexpendA* and log(*expendB*) is *lexpendB*.
+
+### (i) What is the interpretation of $\beta_{1}$?
+
+*Hint:* This is a level-log model. Look back at how a 1% change in *x* affects *y* in that case.
+
+**Answer:**
+
+### (ii) In terms of the parameters, state the null hypothesis that a 1% increase in A's expenditures is offset by a 1% increase in B's expenditures.
+
+**Answer:**
+
+### (iii) Estimate the given model using the data in VOTE1 and report the results in usual form. Do A's expenditures affect the outcome? What about B's expenditures? Can you use these results to test the hypothesis in part (ii)?
+
+```{r}
+reg1 <- lm( voteA ~ lexpendA + lexpendB + prtystrA, data = vote1 )
+summary( reg1 )
+nobs( reg1 )
+```
+
+**Answer:**
+
+### (iv) Estimate a model that directly gives the *t* statistic for testing the hypothesis in part (ii). What do you conclude? (Use a two-sided alternative.)
+
+Define $\theta = \beta_{1} + \beta_{2}$, so $\beta_{1} = \theta - \beta_{2}$. Substituting this into the model and rearranging gives $$voteA=\beta_{0}+\theta\log(expendA)+\beta_{2}[\log(expendB)-\log(expendA)]+\beta_{3}prtystrA+u.$$ So we regress *voteA* on *lexpendA*, the *difference* lexpendB $-$ lexpendA, and *prtystrA*. The coefficient on *lexpendA* is now $\hat{\theta}$, and its t value tests $H_0: \theta = 0$. Inside lm(), I( ) tells R to compute the difference first and treat it as one variable.
+
+```{r}
+reg2 <- lm( voteA ~ lexpendA + I( lexpendB - lexpendA ) + prtystrA, data = vote1 )
+summary( reg2 )
+```
+
+R can also run this test directly on the original regression with linearHypothesis(). It reports an F statistic rather than a t statistic, but for a single restriction F is just $t^2$, and the p-value is the same.
+
+```{r}
+linearHypothesis( reg1, "lexpendA + lexpendB = 0" )
+```
+
+**Answer:**
+
+### (v) *(Not in the book.)* Use the regression from part (iv) to construct a 95% confidence interval for $\theta$. Does it lead to the same conclusion as your test in part (iv)? Explain.
+
+```{r}
+confint( reg2, level = 0.95 )
+```
+
+**Answer:**
+
+------------------------------------------------------------------------
+
+## C2 (10 points)
+
+Use the data in LAWSCH85 for this exercise. This is the model from Problem 4 in Chapter 3: $$\log(salary)=\beta_{0}+\beta_{1}LSAT+\beta_{2}GPA+\beta_{3}\log(libvol)+\beta_{4}\log(cost)+\beta_{5}rank+u,$$ where *salary* is the median starting salary of the law school's graduates, *LSAT* and *GPA* are the median LSAT score and college GPA of the entering class, *libvol* is the number of volumes in the law library, *cost* is annual tuition, and *rank* is the school's ranking (*rank* = 1 is the best school). In LAWSCH85 the logs are *lsalary*, *llibvol*, and *lcost*.
+
+Some schools are missing values for some variables. lm() drops those schools automatically, and linearHypothesis() uses the same schools as the regression you give it, so you do not need to do anything extra.
+
+### (i) State and test the null hypothesis that the rank of law schools has no ceteris paribus effect on median starting salary.
+
+```{r}
+reg3 <- lm( lsalary ~ LSAT + GPA + llibvol + lcost + rank, data = lawsch85 )
+summary( reg3 )
+nobs( reg3 )
+```
+
+**Answer:**
+
+### (ii) Are features of the incoming class of students---namely, *LSAT* and *GPA*---individually or jointly significant for explaining *salary*?
+
+For "individually," use the t statistics in summary( reg3 ). For "jointly," you need an F test. To test more than one restriction at once, put them inside c( ), separated by commas: linearHypothesis( reg3, c( "LSAT = 0", "GPA = 0" ) ).
+
+```{r}
+# Your turn: run the joint test of LSAT and GPA on reg3
+
+```
+
+**Answer:**
+
+### (iii) Test whether the size of the entering class (*clsize*) or the size of the faculty (*faculty*) needs to be added to this equation; carry out a single test.
+
+```{r}
+# Your turn: copy the reg3 line, add + clsize + faculty, and name it reg4
+# Then add a line that runs the joint test of clsize and faculty on reg4
+
+```
+
+**Answer:**
+
+### (iv) What factors might influence the rank of the law school that are not included in the salary regression?
+
+**Answer:**
+
+------------------------------------------------------------------------
+
+## C8 (10 points)
+
+The data set 401KSUBS contains information on net financial wealth (*nettfa*), age of the survey respondent (*age*), annual family income (*inc*), family size (*fsize*), and participation in certain pension plans for people in the United States. The wealth and income variables are both recorded in thousands of dollars. For this question, use only the data for single-person households (so *fsize* = 1).
+
+In R, this data set is called k401ksubs.
+
+### (i) How many single-person households are there in the data set?
+
+subset() keeps only the rows that meet a condition. Note the double equals sign, ==, which means "is equal to."
+
+```{r}
+single <- subset( k401ksubs, fsize == 1 )
+nrow( single )
+```
+
+**Answer:**
+
+### (ii) Use OLS to estimate the model $nettfa=\beta_{0}+\beta_{1}inc+\beta_{2}age+u$ and report the results using the usual format. Be sure to use only the single-person households in the sample. Interpret the slope coefficients. Are there any surprises in the slope estimates?
+
+```{r}
+reg5 <- lm( nettfa ~ inc + age, data = single )
+summary( reg5 )
+```
+
+**Answer:**
+
+### (iii) Does the intercept from the regression in part (ii) have an interesting meaning? Explain.
+
+**Answer:**
+
+### (iv) Find the p-value for the test $H_0: \beta_{2}=1$ against $H_1: \beta_{2}<1$. Do you reject $H_0$ at the 1% significance level?
+
+The t value in summary( reg5 ) tests $\beta_{2} = 0$, which is not the null here. The code below pulls the estimate and standard error on *age* out of the regression and computes $t = (\hat{\beta}_{2} - 1)/se(\hat{\beta}_{2})$. Because the alternative is $\beta_{2} < 1$, the p-value is the area in the *left* tail of the t distribution, below your t statistic. pt() gives exactly that area.
+
+```{r}
+b_age  <- coef( summary( reg5 ) )["age", "Estimate"]
+se_age <- coef( summary( reg5 ) )["age", "Std. Error"]
+t_age  <- ( b_age - 1 ) / se_age
+t_age
+pt( t_age, df = df.residual( reg5 ) )
+```
+
+**Answer:**
+
+### (v) If you do a simple regression of *nettfa* on *inc*, is the estimated coefficient on *inc* much different from the estimate in part (ii)? Why or why not?
+
+*Hint:* Think back to Chapter 3. When does adding a variable change the coefficient on another variable?
+
+```{r}
+# Your turn: regress nettfa on inc only (using single), and name it reg6
+# Then add: summary( reg6 )
+# Then add a line that finds the correlation between inc and age:
+#   cor( single$inc, single$age )
+
+```
+
+**Answer:**
+
+------------------------------------------------------------------------
+
+## C14 (10 points)
+
+Use the data set JTRAIN98 to answer this question. *earn98* and *earn96* are earnings in 1998 and 1996 in thousands of dollars, *train* = 1 if the worker took part in the job training program, and *unem96* = 1 if the worker was unemployed in 1996. Equation (4.52) is:
+
+```{r}
+reg7 <- lm( earn98 ~ train + earn96 + educ + age + married, data = jtrain98 )
+summary( reg7 )
+```
+
+### (i) Add the unemployment indicator *unem96* to the regression reported in equation (4.52). Interpret its coefficient and discuss whether its sign and magnitude seem sensible. Is the estimate statistically significant?
+
+```{r}
+# Your turn: copy the reg7 line, add + unem96, and name it reg8
+# Then add: summary( reg8 )
+
+```
+
+**Answer:**
+
+### (ii) What happens to the estimated job training effect compared with equation (4.52)? Is it still economically and statistically significant?
+
+**Answer:**
+
+### (iii) Find the correlation between *earn96* and *unem96*. Is it about what you would expect? Explain.
+
+```{r}
+# Your turn: find the correlation between earn96 and unem96 in jtrain98
+
+```
+
+**Answer:**
+
+### (iv) Do you think your finding in part (iii) means you should drop *unem96* from the regression? Explain.
+
+**Answer:**
