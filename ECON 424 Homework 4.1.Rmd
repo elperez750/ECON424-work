@@ -46,7 +46,7 @@ summary( reg1 )
 nobs( reg1 )
 ```
 
-**Answer: Looking at the numbers, we can see that expendanture for candidate A will have a positive effect on the number of votes for candidate a. We can also see that the expenditure for candidate B will have a negative effect on the number of votes for candidate A. These results prove the null hypothesis, as we see that the coefficients are very similar to each other, meaning that they practically cancel each other out.**
+**Answer: Looking at the numbers, we can see that expenditure for candidate A will have a positive effect on the number of votes for candidate a. We can also see that the expenditure for candidate B will have a negative effect on the number of votes for candidate A. These results prove the null hypothesis, as we see that the coefficients are very similar to each other, meaning that they practically cancel each other out.**
 
 ### (iv) Estimate a model that directly gives the *t* statistic for testing the hypothesis in part (ii). What do you conclude? (Use a two-sided alternative.)
 
@@ -89,7 +89,7 @@ summary( reg3 )
 nobs( reg3 )
 ```
 
-**Answer:**
+**Answer: The null hypothesis for the rank of law school having no effect on the wage would be H0: rank = 0**
 
 ### (ii) Are features of the incoming class of students---namely, *LSAT* and *GPA*---individually or jointly significant for explaining *salary*?
 
@@ -97,6 +97,7 @@ For "individually," use the t statistics in summary( reg3 ). For "jointly," you 
 
 ```{r}
 # Your turn: run the joint test of LSAT and GPA on reg3
+linearHypothesis(reg3, c("LSAT = 0", "GPA = 0"))
 
 ```
 
