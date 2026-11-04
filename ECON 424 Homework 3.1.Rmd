@@ -59,7 +59,7 @@ Now interpret the coefficient on *prpblck*, holding *income* fixed. Because *prp
 0.10 * coef( reg1 )["prpblck"]
 ```
 
-**Answer: For a 10 percent increase in the proportion of black people, we will add 0.011 cents on average to the price of soda.**
+**Answer: For a 10 percent increase in the proportion of black people, we will add 1.15 cents on average to the price of soda. This is not large economically, as 1 cent is about 1 percent of the price of an average soda.**
 
 ### (iii) Compare the estimate from part (ii) with the simple regression estimate from *psoda* on *prpblck*. Is the discrimination effect larger or smaller when you control for income?
 
@@ -68,11 +68,11 @@ In the chunk below, copy the reg1 line from part (ii), delete + income, and chan
 ```{r}
 # Your turn: copy the reg1 line, delete + income, and name it reg2
 # Then add: summary( reg2 )
-reg2 <- lm( psoda ~ income, data=discrim )
+reg2 <- lm( psoda ~ prpblck, data=discrim )
 summary ( reg2 )
 ```
 
-**Answer: When you control for income, we see that the slope value for** $\beta_{1}$ is `r sprintf( "%.7f", coef( reg2 )[2] )`. The previous slope value when the price of soda was regressed with two independent variables was `r sprintf( "%.3f", coef( reg1 )[2] )` . This is a much larger value when we just control for income.
+**Answer: When you do not control for income, we see that the slope value for** $\beta_{1}$ is `r sprintf( "%.7f", coef( reg2 )[2] )`. The previous slope value when the price of soda was regressed with two independent variables was `r sprintf( "%.3f", coef( reg1 )[2] )` . This is a much larger value when we just control for income. This is because as income goes up, the price of soda goes up. We also know that black heavy zip codes tend to have lower incomes, so therefore, our coefficient is biased down.
 
 ### (iv) A model with a constant price elasticity with respect to income may be more appropriate. Report estimates of the model $$\log(psoda)=\beta_{0}+\beta_{1}prpblck+\beta_{2}\log(income)+u.$$ If *prpblck* increases by 0.20 (20 percentage points), what is the estimated percentage change in *psoda*? (*Hint*: The answer is 2.*xx*, where you fill in the "xx.")
 
@@ -103,7 +103,7 @@ summary( reg4 )
 
 ```
 
-**Answer: When we add prppov to the linear regression, we see that our slope for prpblck is `r coef(reg4["prpblck"])`** , which is smaller than our slope that we had before, which was `r coef(reg3["prpblck"])`
+**Answer: When we add prppov to the linear regression, we see that our slope for prpblck is `r coef(reg4) ["prpblck"]`** , which is smaller than our slope that we had before, which was `r coef(reg3) ["prpblck"]`
 
 ### (vi) Find the correlation between $\log(income)$ and *prppov*. Is it roughly what you expected?
 
@@ -113,13 +113,13 @@ use = "complete.obs" tells cor() to skip ZIP codes with missing values, just lik
 cor( log( discrim$income ), discrim$prppov, use = "complete.obs" )
 ```
 
-**Answer: The correlation is -0.83 which is exactly what I expected since as the proportion of zipcodes in poverty increase, the more wages tend to go down.**
+**Answer: The correlation is -0.838467 which is exactly what I expected since as the proportion of zipcodes in poverty increase, the more wages tend to go down on average.**
 
 ### (vii) Evaluate the following statement: "Because $\log(income)$ and *prppov* are so highly correlated, they have no business being in the same regression."
 
 *Hint:* What would happen to the estimate on *prpblck* if you dropped one of them? Does high correlation between two control variables make the OLS estimates biased?
 
-**Answer: The following statement is misguided. Since they are so highly correlated, dropping one of the terms will make the other term biased and result in the coefficient one the term that was not dropped either increase or decrease depending on how they were correlated.**
+**Answer: The following statement is misguided. Since they are so highly correlated, dropping one of the terms will make the other term biased since we would be dropping a variable that affects psoda and is correlated with prpblck. We saw this in part V of this question, when leaving out prppov made prpblck larger.**
 
 ------------------------------------------------------------------------
 
@@ -167,7 +167,7 @@ nobs( reg5 )
 
 ***R*****-squared: 0.2493**
 
-**Answer: The variation in education that is explained that is explained by parents education is about 25 percent, which means that 75 percent of the variation comes from other factors.**
+**Answer: The variation in education that is explained that is explained by parents education is about 25 percent, which means that 75 percent of the variation comes from other factors. The interpretation for the coefficient on motheduc is that for each year change in the mother's education, leaving all else equal, it will contribute 0.30420 years on the students total years of education on average.**
 
 ### (iii) Add the variable *abil* (a measure of cognitive ability) to the regression from part (ii), and report the results in equation form. Does "ability" help to explain variations in education, even after controlling for parents' education? Explain.
 
@@ -176,22 +176,24 @@ In the chunk below, copy the reg5 line from part (ii), add + abil after fatheduc
 ```{r}
 # Your turn: copy the reg5 line, add + abil, and name it reg6
 # Then add: summary( reg6 )
-
+reg6 <- lm( educ ~ motheduc + fatheduc + abil, data = htv )
+summary( reg6 )
+nobs( reg6 )
 ```
 
 *Fill in the numbers below, then answer the question.*
 
-**Intercept** ($\hat{\beta}_{0}$):
+**Intercept** ($\hat{\beta}_{0}$): 8.44869
 
-**Coefficient on *motheduc***:
+**Coefficient on *motheduc***: 0.18913
 
-**Coefficient on *fatheduc***:
+**Coefficient on *fatheduc***: 0.11109
 
-**Coefficient on *abil***:
+**Coefficient on *abil***: 0.50248
 
-***R*****-squared:**
+***R*****-squared: 0.4275**
 
-**Answer:**
+**Answer: When we add ability to our regression, we see that the coefficients for both the amount of yearrs of education for the father and the mother go down. We also see that our R\^2 value went up. Adding ability helps us realize that the previous model with only parents years of education was biased upwards.**
 
 ------------------------------------------------------------------------
 
@@ -211,15 +213,15 @@ nobs( reg7 )
 
 *Fill in the four numbers below, then answer the questions.*
 
-**Intercept** ($\hat{\beta}_{0}$):
+**Intercept** ($\hat{\beta}_{0}$): 96.77043
 
-**Slope** ($\hat{\beta}_{1}$):
+**Slope** ($\hat{\beta}_{1}$): -0.83288
 
-***n*****:**
+***n*****: 229**
 
-***R*****-squared:**
+***R*****-squared: 0.3795**
 
-**Answer:**
+**Answer: The slope for pctsgle seems large, since interpreted, it means that for each increase of children not living in a married parent household, the percentage of children with a satisfactory math score will decrease by 0.83 percentage points**
 
 ### (ii) Add the variables *lmedinc* and *free* to the equation. What happens to the coefficient on *pctsgle*? Explain what is happening.
 
@@ -228,10 +230,12 @@ nobs( reg7 )
 ```{r}
 # Your turn: copy the reg7 line, add + lmedinc + free, and name it reg8
 # Then add: summary( reg8 )
-
+reg8 <- lm( math4 ~ pctsgle + lmedinc + free, data = meapsingle )
+summary( reg8 )
+nobs( reg8 )
 ```
 
-**Answer:**
+**Answer: We see that since we are adding multiple values that are correlated with the child's math score, we see that the value for pctsgle goes from `r coef(reg7)[2]`** to `r coef( reg8 )[2]` , which is a substantial drop. This means that our previous regression model with just pctsgle was biased downwards.
 
 ### (iii) Find the sample correlation between *lmedinc* and *free*. Does it have the sign you expect?
 
@@ -239,8 +243,8 @@ nobs( reg7 )
 cor( meapsingle$lmedinc, meapsingle$free )
 ```
 
-**Answer:**
+**Answer: The correlation between the following is -0.7469703. This makes sense, as we can see that the coefficient for lmedinc is positive while the coefficient for free is negative.**
 
 ### (iv) Does the substantial correlation between *lmedinc* and *free* mean that you should drop one from the regression to better estimate the causal effect of single parenthood on student performance? Explain.
 
-**Answer:**
+**Answer: No, we should not drop either term, as it would lead to omitted variable bias in either lmedinc or free.**

@@ -101,21 +101,26 @@ linearHypothesis(reg3, c("LSAT = 0", "GPA = 0"))
 
 ```
 
-**Answer:**
+**Answer: When we look at our coefficients separately, we can see that we have significant evidence that GPA is associated with our salary, as we rejected our p value since it is less than 0.05. On the other hand, we fail to reject the p value for LSAT since the p value is greater that 0.05. When we test them jointly, we see that we reject our null hypothesis at 0.05 percent.**
 
 ### (iii) Test whether the size of the entering class (*clsize*) or the size of the faculty (*faculty*) needs to be added to this equation; carry out a single test.
 
 ```{r}
 # Your turn: copy the reg3 line, add + clsize + faculty, and name it reg4
 # Then add a line that runs the joint test of clsize and faculty on reg4
+reg4 <- lm( lsalary ~ LSAT + GPA + llibvol + lcost + rank + clsize + faculty, data = lawsch85 )
+summary( reg4 )
+nobs( reg4 )
+linearHypothesis(reg4, c("clsize = 0", "faculty = 0"))
+
 
 ```
 
-**Answer:**
+**Answer: for class size and faculty members, when we test them individually, we see that the p values are above the threshold, meaning that assuming that 0 were the true coefficient, getting a t value that extreme would be more likely. We see the same thing for our joint test. We would fail to reject, meaning that getting a F value that extreme would be more common.**
 
 ### (iv) What factors might influence the rank of the law school that are not included in the salary regression?
 
-**Answer:**
+**Answer: Some factors that might influence the rank of the law school might be the amount of funding that it gets, the location of the school.**
 
 ------------------------------------------------------------------------
 
@@ -134,7 +139,7 @@ single <- subset( k401ksubs, fsize == 1 )
 nrow( single )
 ```
 
-**Answer:**
+**Answer: There are 2017 single person households in the dataset.**
 
 ### (ii) Use OLS to estimate the model $nettfa=\beta_{0}+\beta_{1}inc+\beta_{2}age+u$ and report the results using the usual format. Be sure to use only the single-person households in the sample. Interpret the slope coefficients. Are there any surprises in the slope estimates?
 
@@ -143,11 +148,11 @@ reg5 <- lm( nettfa ~ inc + age, data = single )
 summary( reg5 )
 ```
 
-**Answer:**
+**Answer: For the slope coefficients, we have 0.79932 for annual family income and we have 0.84266 for our age. For the first coefficient, that means that for each additional dollar that is added to family income, our net financial wealth would increase by 0.79932 on average. For each additional year that someone turns, we would contribute 0.84266 cents to our net financial wealth. Both of these make sense to me, as both increasing would seem to lead to an increase in our net financial wealth.**
 
 ### (iii) Does the intercept from the regression in part (ii) have an interesting meaning? Explain.
 
-**Answer:**
+**Answer: The intercept has an interesting meaning because it implies that on average, if our age and our family income were both zero, then our financial wealth would be in the negatives.**
 
 ### (iv) Find the p-value for the test $H_0: \beta_{2}=1$ against $H_1: \beta_{2}<1$. Do you reject $H_0$ at the 1% significance level?
 
