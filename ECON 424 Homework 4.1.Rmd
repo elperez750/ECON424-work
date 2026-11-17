@@ -32,11 +32,11 @@ In VOTE1, the logs are already computed: log(*expendA*) is *lexpendA* and log(*e
 
 *Hint:* This is a level-log model. Look back at how a 1% change in *x* affects *y* in that case.
 
-**Answer: Holding all else equal, a one percent increase in expenditure will result in 1 more vote for candidate A.**
+**Answer: Holding all else equal, a one percent increase in expenditure for candidate A will result in** $\frac{\beta_{1}}{100}$ **more points for candidate A.**
 
 ### (ii) In terms of the parameters, state the null hypothesis that a 1% increase in A's expenditures is offset by a 1% increase in B's expenditures.
 
-**Answer: H0: expendA - expendB = 0**
+**Answer: H0:** $\beta_{1}+\beta_{2}$ **= 0**
 
 ### (iii) Estimate the given model using the data in VOTE1 and report the results in usual form. Do A's expenditures affect the outcome? What about B's expenditures? Can you use these results to test the hypothesis in part (ii)?
 
@@ -46,7 +46,7 @@ summary( reg1 )
 nobs( reg1 )
 ```
 
-**Answer: Looking at the numbers, we can see that expenditure for candidate A will have a positive effect on the number of votes for candidate a. We can also see that the expenditure for candidate B will have a negative effect on the number of votes for candidate A. These results prove the null hypothesis, as we see that the coefficients are very similar to each other, meaning that they practically cancel each other out.**
+**Answer: Looking at the numbers, we can see that expenditure for candidate A will have a positive effect on the number of votes for candidate a. We can also see that the expenditure for candidate B will have a negative effect on the number of votes for candidate A. These results prove that our null hypothesis is highly likely, so we fail to reject it**
 
 ### (iv) Estimate a model that directly gives the *t* statistic for testing the hypothesis in part (ii). What do you conclude? (Use a two-sided alternative.)
 
@@ -63,7 +63,7 @@ R can also run this test directly on the original regression with linearHypothes
 linearHypothesis( reg1, "lexpendA + lexpendB = 0" )
 ```
 
-**Answer:**
+**Answer: We see that the p value for our null hypothesis was 0.3196. Since this is bigger than most of our thresholds, then we fail to reject our null hypothesis.**
 
 ### (v) *(Not in the book.)* Use the regression from part (iv) to construct a 95% confidence interval for $\theta$. Does it lead to the same conclusion as your test in part (iv)? Explain.
 
@@ -71,7 +71,7 @@ linearHypothesis( reg1, "lexpendA + lexpendB = 0" )
 confint( reg2, level = 0.95 )
 ```
 
-**Answer:**
+**Answer: This would lead to the same conclusion as we see that our p value falls in between the threshold of -1.58446 and 0.52026, we would fail to reject.**
 
 ------------------------------------------------------------------------
 
@@ -89,7 +89,7 @@ summary( reg3 )
 nobs( reg3 )
 ```
 
-**Answer: The null hypothesis for the rank of law school having no effect on the wage would be H0: rank = 0**
+**Answer: The null hypothesis for the rank of law school having no effect on the wage would be H0:** $\beta_5$ **= 0. When we test this, we see that we would reject this null hypothesis, as it is less than 0.05**
 
 ### (ii) Are features of the incoming class of students---namely, *LSAT* and *GPA*---individually or jointly significant for explaining *salary*?
 
@@ -101,7 +101,7 @@ linearHypothesis(reg3, c("LSAT = 0", "GPA = 0"))
 
 ```
 
-**Answer: When we look at our coefficients separately, we can see that we have significant evidence that GPA is associated with our salary, as we rejected our p value since it is less than 0.05. On the other hand, we fail to reject the p value for LSAT since the p value is greater that 0.05. When we test them jointly, we see that we reject our null hypothesis at 0.05 percent.**
+**Answer: When we look at our coefficients separately, we can see that we have significant evidence that GPA is associated with our salary, as we fail to reject our null hypothesis since our p value for GPA is greater than 0.05. We also fail to reject the p value for LSAT since the p value is greater that 0.05. When we test them jointly, we see that we reject our null hypothesis at 0.05 percent.**
 
 ### (iii) Test whether the size of the entering class (*clsize*) or the size of the faculty (*faculty*) needs to be added to this equation; carry out a single test.
 
@@ -116,7 +116,7 @@ linearHypothesis(reg4, c("clsize = 0", "faculty = 0"))
 
 ```
 
-**Answer: for class size and faculty members, when we test them individually, we see that the p values are above the threshold, meaning that assuming that 0 were the true coefficient, getting a t value that extreme would be more likely. We see the same thing for our joint test. We would fail to reject, meaning that getting a F value that extreme would be more common.**
+**Answer: for class size and faculty members, when we test them individually, we see that the p values for class size and faculty members are 0.38379 and 0.86629 respectively, which are above the threshold, meaning that assuming that 0 were the true coefficient, getting a t value that extreme would be more likely. We see the same thing for our joint test. We would fail to reject, meaning that getting a F value that extreme would be more common.**
 
 ### (iv) What factors might influence the rank of the law school that are not included in the salary regression?
 
@@ -152,21 +152,26 @@ summary( reg5 )
 
 ### (iii) Does the intercept from the regression in part (ii) have an interesting meaning? Explain.
 
-**Answer: The intercept has an interesting meaning because it implies that on average, if our age and our family income were both zero, then our financial wealth would be in the negatives.**
+**Answer: The intercept has an interesting meaning because it implies that on average, if our age and our family income were both zero, then our financial wealth would be in the negatives. This is an extrapolation since the youngest person in the data set is 25. We do not have anyone younger**
 
 ### (iv) Find the p-value for the test $H_0: \beta_{2}=1$ against $H_1: \beta_{2}<1$. Do you reject $H_0$ at the 1% significance level?
 
 The t value in summary( reg5 ) tests $\beta_{2} = 0$, which is not the null here. The code below pulls the estimate and standard error on *age* out of the regression and computes $t = (\hat{\beta}_{2} - 1)/se(\hat{\beta}_{2})$. Because the alternative is $\beta_{2} < 1$, the p-value is the area in the *left* tail of the t distribution, below your t statistic. pt() gives exactly that area.
 
 ```{r}
+summary(reg5)
+
+# Getting our beta for age
 b_age  <- coef( summary( reg5 ) )["age", "Estimate"]
+# Getting the standard error for age
 se_age <- coef( summary( reg5 ) )["age", "Std. Error"]
+# Computing t value
 t_age  <- ( b_age - 1 ) / se_age
 t_age
 pt( t_age, df = df.residual( reg5 ) )
 ```
 
-**Answer:**
+**Answer: The p value for our null hypothesis is 0.0437. Since this is greater than 1 percent, we would fail to reject this.**
 
 ### (v) If you do a simple regression of *nettfa* on *inc*, is the estimated coefficient on *inc* much different from the estimate in part (ii)? Why or why not?
 
@@ -177,10 +182,11 @@ pt( t_age, df = df.residual( reg5 ) )
 # Then add: summary( reg6 )
 # Then add a line that finds the correlation between inc and age:
 #   cor( single$inc, single$age )
-
+reg6 <- lm( nettfa ~ inc, data=single)
+summary(reg6)
 ```
 
-**Answer:**
+**Answer: We see that when we only have income in our model, that our beta value for income will be higher, but not by much. This is because of the fact that the other variable that we regressed on we related to our net financial wealth.**
 
 ------------------------------------------------------------------------
 
@@ -198,24 +204,26 @@ summary( reg7 )
 ```{r}
 # Your turn: copy the reg7 line, add + unem96, and name it reg8
 # Then add: summary( reg8 )
-
+reg8 <- lm( earn98 ~ train + earn96 + educ + age + married + unem96, data = jtrain98 )
+summary( reg8 )
 ```
 
-**Answer:**
+**Answer: The sign for the coefficient on unemployment in 1996 is negative. This magnitude seems sensible as being unemployed can have a negative impact on your future earnings. Since our p value is much smaller than all of our thresholds, we can reject the null hypothesis that unem96 has no impact on our earnings.**
 
 ### (ii) What happens to the estimated job training effect compared with equation (4.52)? Is it still economically and statistically significant?
 
-**Answer:**
+**Answer: When we look at the p value, we see that it is still rejected even when we add another value to the regression.**
 
 ### (iii) Find the correlation between *earn96* and *unem96*. Is it about what you would expect? Explain.
 
 ```{r}
 # Your turn: find the correlation between earn96 and unem96 in jtrain98
+cor(jtrain98$earn96, jtrain98$unem96)
 
 ```
 
-**Answer:**
+**Answer: The correlation between earnings in 1996 and unemployment in 1996 is highly negative correlated, meaning that the higher the earnings were in 1996 were, the more likely the person was not unemployed in 1996.**
 
 ### (iv) Do you think your finding in part (iii) means you should drop *unem96* from the regression? Explain.
 
-**Answer:**
+**Answer: Not necessarily. Dropping it would bias the training estimate.**

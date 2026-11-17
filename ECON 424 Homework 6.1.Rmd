@@ -1,0 +1,265 @@
+---
+title: "ECON 424 Chapter 6 Computer Exercises"
+author: Elliott Perez
+date: "Friday, November 13, 2026"
+output: word_document
+---
+
+*Before you knit, replace "John Doe" in the header above with your own name. Type your answers after each* **Answer:** *line.*
+
+*Exercise and part numbers follow Wooldridge's Chapter 6 computer exercises; some are skipped.*
+
+```{r message=F, warning=F, error=F}
+library(wooldridge)
+library(dplyr)
+library(car)
+options( scipen = 64 )
+```
+
+Chapter 6 adds three tools to the regressions you already know how to run:
+
+- **Quadratics.** To include $x^2$ in a regression, write I( x\^2 ) inside lm(). The I( ) tells R to compute the square first and treat it as one variable.
+- **Interactions.** To include $x \cdot z$, write I( x \* z ).
+- **Predictions.** predict() plugs values of the *x*'s into an estimated equation. With interval = "confidence" it gives a confidence interval for the *average* *y* at those values; with interval = "prediction" it gives an interval for *one* new observation.
+
+------------------------------------------------------------------------
+
+## C3 (10 points)
+
+Consider a model in which the return to education depends upon the amount of work experience (and vice versa): $$\log(wage)=\beta_{0}+\beta_{1}educ+\beta_{2}exper+\beta_{3}educ\cdot exper+u.$$
+
+### (i) Show that the return to another year of education (in decimal form), holding *exper* fixed, is $\beta_{1}+\beta_{3}exper$.
+
+*Hint:* Increase *educ* by 1 while holding *exper* fixed. Which terms in the equation change, and by how much?
+
+**Answer: Since we are holding experience fixed and we are changing education, we can obtain the final form by redefining our model. Let our model when we add one more year be the following:**
+
+$$\log(wage)=\beta_{0}+\beta_{1}(educ +1)+\beta_{2}exper+\beta_{3}(educ + 1)\cdot exper+u.$$
+
+If we take our original equation and subtract it from this one, we will see that the terms that the coefficients that are not multiplied by our educ variable will go to zero, giving us the final solution:
+
+$$\beta_{1} + \beta{3}exper$$
+
+This makes sense logically, as anything that is not affected by an increase in education will not impact our model. It will remain constant as education changes.
+
+### 
+
+### (ii) State the null hypothesis that the return to education does not depend on the level of *exper*. What do you think is the appropriate alternative?
+
+**Answer:** $$H_0: \beta_3 = 0; H_1: \beta_3 \neq0$$ The appropriate alternative would be to check if education does depend on the level of experience, so we would check if the coefficient on the interaction terms is anything but 0.
+
+### (iii) Use the data in WAGE2 to test the null hypothesis in (ii) against your stated alternative.
+
+The logged wage is already in WAGE2 as *lwage*. If your alternative is one-sided, remember that the p-value in summary() is two-sided. When the estimate has the sign your alternative predicts, the one-sided p-value is half the two-sided one.
+
+```{r}
+reg1 <- lm( lwage ~ educ + exper + I( educ * exper ), data = wage2 )
+summary( reg1 )
+nobs( reg1 )
+```
+
+**Answer: For our two sided test, we get a p-value of 0.0365, which is less than our 0.05 cutoff, so we reject** $$H_0$$.
+
+### (iv) Let $\theta_{1}$ denote the return to education (in decimal form) when *exper* = 10: $\theta_{1}=\beta_{1}+10\beta_{3}$. Obtain $\hat{\theta}_{1}$ and a 95% confidence interval for $\theta_{1}$.
+
+This is the same trick we used on the attendance example in class, where we replaced priGPA with (priGPA $-$ 2.59) inside the interaction so that the coefficient on *atndrte* became the effect of attendance for a student with a 2.59 prior GPA.
+
+Here, write $\beta_{1}=\theta_{1}-10\beta_{3}$ and plug it into the model. After rearranging, $$\log(wage)=\beta_{0}+\theta_{1}educ+\beta_{2}exper+\beta_{3}educ\cdot(exper-10)+u.$$ So we replace *exper* with (*exper* $-$ 10) **inside the interaction only**. The coefficient on *educ* in this new regression is $\hat{\theta}_{1}$, and confint() gives its confidence interval directly.
+
+```{r}
+reg2 <- lm( lwage ~ educ + exper + I( educ * ( exper - 10 ) ), data = wage2 )
+summary( reg2 )
+confint( reg2 )
+```
+
+As a check, the coefficient on *educ* should equal $\hat{\beta}_{1}+10\hat{\beta}_{3}$ from reg1:
+
+```{r}
+coef( reg1 )["educ"] + 10 * coef( reg1 )["I(educ * exper)"]
+```
+
+**Answer: The coefficient for the return on education when experience is 10 is 0.0760793.**
+
+------------------------------------------------------------------------
+
+## C8 (10 points)
+
+Use the data in HPRICE1 for this exercise. *price* is the house price in thousands of dollars, *lotsize* and *sqrft* are the lot size and house size in square feet, and *bdrms* is the number of bedrooms.
+
+### (i) Estimate the model $price=\beta_{0}+\beta_{1}lotsize+\beta_{2}sqrft+\beta_{3}bdrms+u$ and report the results in the usual form, including the standard error of the regression. Obtain predicted price, when we plug in *lotsize* = 10,000, *sqrft* = 2,300, and *bdrms* = 4; round this price to the nearest dollar.
+
+The standard error of the regression, $\hat{\sigma}$, is the "Residual standard error" near the bottom of the summary() output. Because *price* is in thousands, a prediction of 250.123 means \$250,123.
+
+```{r}
+reg3 <- lm( price ~ lotsize + sqrft + bdrms, data = hprice1 )
+summary( reg3 )
+
+house <- data.frame( lotsize = 10000, sqrft = 2300, bdrms = 4 )
+# summary(hprice1$price)
+predict( reg3, house )
+```
+
+**Answer: For our estimated coefficients, we get -21.7703081 for our intercept, 0.0020677** for our lot size, 0.1227782 for sqft, and 13.8525217 for our bdrms. Our residual standard error is 59.83. When we estimate the price of a home with the inputs given above, we estimate the value of the home to be about \$336,707
+
+### (ii) Run a regression that allows you to put a 95% confidence interval around the predicted value in part (i). Note that your prediction will differ somewhat due to rounding error.
+
+This is the C3(iv) trick again, applied to the intercept. Subtract the chosen value from each *x*: use I( lotsize - 10000 ), I( sqrft - 2300 ), and I( bdrms - 4 ). The **intercept** of the new regression is then the predicted price for this house, and its row in confint() is the confidence interval.
+
+```{r}
+# Your turn: copy the reg3 line, replace each x with its I( x - value ) version,
+#   and name it reg4
+reg4 <- lm( price ~ I(lotsize - 10000) + I(sqrft - 2300) + I(bdrms - 4), data = hprice1 )
+# Then add: summary( reg4 )
+# Then add: confint( reg4 )
+summary( reg4 )
+confint( reg4 )
+
+```
+
+You can check your answer with predict(). It should give the same interval as the intercept row of confint( reg4 ):
+
+```{r}
+predict( reg3, house, interval = "confidence" )
+```
+
+**Answer: We can see that using the subtraction trick, we are able to get the y intercept to equal the estimate from question one. The confidence interval would be 322.0417 to 351.3716.**
+
+### (iii) Let $price^{0}$ be the unknown future selling price of the house with the characteristics used in parts (i) and (ii). Find a 95% CI for $price^{0}$ and comment on the width of this confidence interval.
+
+This is the prediction interval from class. Its standard error combines the uncertainty in the estimated average (the standard error of the intercept in reg4) with the unexplained variation in an individual house ($\hat{\sigma}$): $$se(\hat{e}^{0})=\sqrt{[se(\hat{y}^{0})]^{2}+\hat{\sigma}^{2}}.$$ predict() does the whole calculation when you use interval = "prediction":
+
+```{r}
+predict( reg3, house, interval = "prediction" )
+```
+
+**Answer: The confidence interval would be from 216.8209 to 456.5924. The width would be 239.7715.**
+
+------------------------------------------------------------------------
+
+## C9 (10 points)
+
+The data set NBASAL contains salary information and career statistics for 269 players in the National Basketball Association (NBA). *points* is points per game, *exper* is years in the league, *age* is age in years, *coll* is years played in college, and *lwage* is the log of annual salary.
+
+### (i) Estimate a model relating points-per-game (*points*) to years in the league (*exper*), *age*, and years played in college (*coll*). Include a quadratic in *exper*; the other variables should appear in level form. Report the results in the usual way.
+
+```{r}
+reg5 <- lm( points ~ exper + I( exper^2 ) + age + coll, data = nbasal )
+summary( reg5 )
+```
+
+**Answer: For our answer. We have an intercept of 35.21831. Our coefficients for exper, exper\^2, age, and coll are 2.36363, -0.07703, -1.07396, -1.28625 respectively.**
+
+### (ii) Holding college years and age fixed, at what value of experience does the next year of experience actually reduce points-per-game? Does this make sense?
+
+The turning point of a quadratic is $-\hat{\beta}_{1}/(2\hat{\beta}_{2})$, where $\hat{\beta}_{1}$ is the coefficient on *exper* and $\hat{\beta}_{2}$ is the coefficient on $exper^2$. The second line counts how many players have more experience than that.
+
+```{r}
+turn <- -coef( reg5 )["exper"] / ( 2 * coef( reg5 )["I(exper^2)"] )
+turn
+sum( nbasal$exper > turn )
+```
+
+**Answer: So after approximately 15 years, we see diminishing returns on points per game. This makes sense, as the older you get, the less athelic you are and the less likely you are to perform as well as players in their first few years.**
+
+### (iii) Why do you think *coll* has a negative and statistically significant coefficient? (*Hint:* NBA players can be drafted before finishing their college careers and even directly out of high school.)
+
+**Answer: coll most likely has a negative effect since the league can draft as early as high school, meaning that they can begin to get experience in the NBA all the while they are still young and growing. A college player playing four 4 years will most likely be 23 or 24 entering the NBA, meaning that the kid drafted from high school has a 4 to 5 year head start on experience playing in the big league and is just as old as those coming from college.**
+
+### (iv) Add a quadratic in *age* to the equation. Is it needed? What does this appear to imply about the effects of age, once experience and education are controlled for?
+
+```{r}
+# Your turn: copy the reg5 line, add + I( age^2 ), and name it reg6
+# Then add: summary( reg6 )
+reg6 <- lm( points ~ exper + I(exper^2) + age + I( age^2 ) + coll, data = nbasal )
+summary( reg6 )
+summary ( nbasal$age )
+```
+
+**Answer: I believe that an quadratic on age is redundant, as experience seems to cover the diminishing returns as the player has more years of experience meaning they are getting older and more tenured in the NBA. It implies that the points per game for a player starts to diminish as the age reaches 16. This makes no sense, as there are no NBA players that young, and even if there were, an age of 16 being the point where**
+
+### (v) Now regress log(*wage*) on *points*, *exper*, $exper^2$, *age*, and *coll*. Report the results in the usual format.
+
+```{r}
+# Your turn: write this regression yourself (the dependent variable is lwage)
+#   and name it reg7
+# Then add: summary( reg7 )
+reg7 <- lm(lwage ~ points + exper + I( exper^2 ) + age + coll, data = nbasal)
+summary (reg7)
+
+```
+
+**Answer: Our intercept when we add log wage is 6.779039. Our coefficients for lwage, exper, exper\^2, age, and coll are 0.07, 0.217845, -0.07, -0.0481, and -0.04 respectively**
+
+### (vi) Test whether *age* and *coll* are jointly significant in the regression from part (v). What does this imply about whether age and education have separate effects on wage, once productivity and seniority are accounted for?
+
+```{r}
+# Your turn: use linearHypothesis() on reg7 to test age and coll jointly
+linearHypothesis(reg7, c("age=0", "coll=0")) 
+```
+
+**Answer: We see that our F statistic is 1.18 and our p value is 0.3061, which is within than our 5 percent threshold, so we reject the null hypothesis, which means that we fail to reject the hypothesis that age has no effect on log wage at any amount of years of schooling.**
+
+------------------------------------------------------------------------
+
+## C13 (10 points)
+
+Use the data in MEAP00 to answer this question. Each observation is a Michigan elementary school. *math4* is the percentage of fourth graders who pass the state math test, *lexppp* is the log of spending per pupil, *lenroll* is the log of enrollment, *lunch* is the percentage of students eligible for the free lunch program (a measure of poverty), and *bcode* is the school's building code.
+
+In R, this data set is called meap00_01.
+
+### (i) Estimate the model $math4=\beta_{0}+\beta_{1}lexppp+\beta_{2}lenroll+\beta_{3}lunch+u$ by OLS, and report the results in the usual form. Is each explanatory variable statistically significant at the 5% level?
+
+```{r}
+reg8 <- lm( math4 ~ lexppp + lenroll + lunch, data = meap00_01 )
+summary( reg8 )
+```
+
+**Answer: The intercept for the following is 91.93246. The following coefficients for lexppp, lenroll, and lunch are 3.52474, -5.39915, -0.44874 respectively. The variables that are significant are lenroll and lunch**
+
+### (ii) Obtain the fitted values from the regression in part (i). What is the range of fitted values? How does it compare with the range of the actual data on *math4*?
+
+```{r}
+range( fitted( reg8 ) )
+range( meap00_01$math4 )
+```
+
+**Answer: The range of the fitted values seems to be 42.41416 to 92.67098. The actual range is 0 to 100 for math scores, so the fitted value range fits in just fine.**
+
+### (iii) Obtain the residuals from the regression in part (i). What is the building code of the school that has the largest (positive) residual? Provide an interpretation of this residual.
+
+which.max() finds the row with the largest residual. The second line shows that school's data, and the last two lines show its residual and its predicted pass rate.
+
+```{r}
+top <- which.max( resid( reg8 ) )
+meap00_01[top, c( "bcode", "math4", "lexppp", "lenroll", "lunch" )]
+resid( reg8 )[top]
+fitted( reg8 )[top]
+```
+
+**Answer: The building code for the school with the largest residual is 1141. We can see that the residual for this was 51.41637, which matches the max residual from part 1. We can see that the actual score was about 97.7 when we add up the residual and the estimated value. This seems to be an outlier school, as the amount of students that qualify for free lunch are all of the students. This alone seems to be a big reason why the model was so off, because holding all else equal, the percentage of students that pass the math test should go down as the percentage of students who are eligible fro free lunch goes up.**
+
+### (iv) Add quadratics of all explanatory variables to the equation, and test them for joint significance. Would you leave them in the model?
+
+```{r}
+# Your turn: copy the reg8 line, add the square of each x using I( ), and name it reg9
+# Then use linearHypothesis() on reg9 to test the three squared terms jointly
+#   (inside the quotes, write each term exactly as it appears in summary( reg9 ),
+#    for example "I(lunch^2) = 0")
+
+reg9 <- lm(math4 ~ lexppp + I(lexppp^2) + lenroll + I(lenroll^2) + lunch + I(lunch^2), data = meap00_01)
+summary( reg9 )
+linearHypothesis(reg9, c("I(lexppp^2)=0", "I(lenroll^2)=0", "I(lunch^2)=0")) 
+```
+
+**Answer: When we test for joint significance, we see that the F value here is 0.518, which is lower than our 5 percent threshold, so we fail to reject the values, meaning that there is enough data to suggest that adding the quadratic terms does nothing for our model.**
+
+### (v) Returning to the model in part (i), divide the dependent variable and each explanatory variable by its sample standard deviation, and rerun the regression. (Include an intercept unless you also first subtract the mean from each variable.) In terms of standard deviation units, which explanatory variable has the largest effect on the math pass rate?
+
+sd() computes a sample standard deviation. Each coefficient in this regression tells you how many standard deviations *math4* changes when that *x* rises by one standard deviation.
+
+```{r}
+reg10 <- lm( I( math4 / sd( math4 ) ) ~ I( lexppp / sd( lexppp ) ) + I( lenroll / sd( lenroll ) ) + I( lunch / sd( lunch ) ), data = meap00_01 )
+summary( reg10 )
+```
+
+**Answer: The variable that explains the largest change in the standard deviation of math scores would be the standard deviation of kids that qualify for free lunch.**
