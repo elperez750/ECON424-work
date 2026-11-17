@@ -106,23 +106,25 @@ reg5 <- lm( points ~ exper + I( exper^2 ) + guard + forward, data = nbasal )
 summary( reg5 )
 ```
 
-**Answer:**
+**Answer: The intercept for the following is 4.76076. The coefficients for exper, exper\^2, guard, forward are 1.28067, -0.07184, 2.31469, 1.54457 respectively**
 
 ### (ii) Why do you not include all three position dummy variables in part (i)?
 
 *Hint:* Every player plays exactly one position. What is *guard* + *forward* + *center* for every player?
 
-**Answer:**
+**Answer: We do not include all positions due to the fact that centers are our base group, meaning we are measuring everything relative to them. For example, a guard scores 2.31469 points than a center does and a forward scores 1.54457 points more on average.**
 
 ### (iii) Holding experience fixed, does a guard score more than a center? How much more? Is the difference statistically significant?
 
-**Answer:**
+**Answer: This was answered in the last question, but holding experience fixed, we see that a guard scores 2.31469 more points than a center does. The t value is 2.313857011, which means that the difference is statistically significant**
 
 ### (iv) Now, add marital status to the equation. Holding position and experience fixed, are married players more productive (based on points per game)?
 
 ```{r}
 # Your turn: copy the reg5 line, add + marr, and name it reg6
 # Then add: summary( reg6 )
+reg6 <- lm( points ~ exper + I( exper^2 ) + guard + forward + marr, data = nbasal )
+summary( reg6 )
 
 ```
 
@@ -138,20 +140,25 @@ In this model, marriage shows up in three places: *marr* on its own and both int
 # Then add: summary( reg7 )
 # Then use linearHypothesis() on reg7 to test marr and the two interactions jointly
 #   (inside the quotes, write each term exactly as it appears in summary( reg7 ))
+reg7 <- lm( points ~ exper + I( exper^2 ) + guard + forward + marr + I( marr * exper) + I( marr * exper^2 ), data = nbasal )
+summary( reg7 )
+linearHypothesis(reg7, c("marr = 0", "I(marr * exper) = 0",  "I(marr * exper^2) = 0"))
 
 ```
 
-**Answer:**
+**Answer: When we test if marital status along with experience effects points in a significant way, we see that our F score is 0.2303, which means that we fail to reject the null hypothesis meaning that they are not significant together in explaining points**
 
 ### (vi) Estimate the model from part (iv) but use assists per game as the dependent variable. Are there any notable differences from part (iv)? Discuss.
 
 ```{r}
 # Your turn: copy your reg6 line, change points to assists, and name it reg8
 # Then add: summary( reg8 )
+reg8 <- lm( assists ~ exper + I( exper^2 ) + guard + forward + marr, data = nbasal )
+summary( reg8 )
 
 ```
 
-**Answer:**
+**Answer: When we change the dependent variable for assists, the most notable difference I see is that our intercept will be negative instead of positive. We also see that our coefficient shrinks for forwards and grows by a bit for guards.**
 
 ------------------------------------------------------------------------
 
@@ -163,7 +170,7 @@ To test for discrimination in the mortgage loan market, a linear probability mod
 
 ### (i) If there is discrimination against minorities, and the appropriate factors have been controlled for, what is the sign of $\beta_{1}$?
 
-**Answer:**
+**Answer: If there was discrimination against minorities, then we would expect the sign of** $$\beta_1$$ to be positive, meaning that white people have a higher probability of being approved for a loan.
 
 ### (ii) Regress *approve* on *white* and report the results in the usual form. Interpret the coefficient on *white*. Is it statistically significant? Is it practically large?
 
@@ -174,7 +181,7 @@ reg9 <- lm( approve ~ white, data = loanapp )
 summary( reg9 )
 ```
 
-**Answer:**
+**Answer: When we regress approve on white, we see that we have an intercept of 0.70779 and white has a coefficient of 0.20060. This means we expect the probability of being approved for a loan to rise 0.20 percent for white people. Our t value is 10.1108871, meaning that this coefficient is very significant and very large as well**
 
 ### (iii) As controls, add the variables *hrat*, *obrat*, *loanprc*, *unem*, *male*, *married*, *dep*, *sch*, *cosign*, *chist*, *pubrec*, *mortlat1*, *mortlat2*, and *vr*. What happens to the coefficient on *white*? Is there still evidence of discrimination against nonwhites?
 
@@ -186,17 +193,19 @@ reg10 <- lm( approve ~ white + hrat + obrat + loanprc + unem + male + married + 
 summary( reg10 )
 ```
 
-**Answer:**
+**Answer: When we add all of these controls, we see that there is still some discrimination for minorities, but adding all of these factors lowers the coefficient on white. We see now that being white make the probability of getting approved rise by 0.12 percent instead of 0.20.**
 
 ### (iv) Now, allow the effect of race to interact with the variable measuring other obligations as a percentage of income (*obrat*). Is the interaction term significant?
 
 ```{r}
 # Your turn: copy the reg10 line, add + I( white * obrat ), and name it reg11
 # Then add: summary( reg11 )
-
+reg11 <- lm( approve ~ white + hrat + obrat + loanprc + unem + male + married + dep + sch +
+                        cosign + chist + pubrec + mortlat1 + mortlat2 + vr + I(white *obrat), data = loanapp )
+summary ( reg11 )
 ```
 
-**Answer:**
+**Answer: When we add an interaction term to the effect of race, we see that the coefficient on there is 0.008088. Our t value is 3.531, which means we reject the null hypothesis meaning that the interaction term is significant.**
 
 ### (v) Using the model from part (iv), what is the effect of being white on the probability of approval when *obrat* = 32, which is roughly the mean value in the sample? Obtain a 95% confidence interval for this effect.
 
@@ -207,6 +216,8 @@ This is the same centering trick as C3(iv) in the Chapter 6 homework. Replace *o
 #   and name it reg12
 # Then add: summary( reg12 )
 # Then add: confint( reg12 )
+reg12 <- lm( approve ~ white + hrat + obrat + loanprc + unem + male + married + dep + sch + cosign + chist + pubrec + mortlat1 + mortlat2 + vr + I(white * (obrat - 32)), data = loanapp )
+summary (reg12)
 
 ```
 
