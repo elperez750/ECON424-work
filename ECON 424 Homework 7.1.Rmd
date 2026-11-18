@@ -217,11 +217,11 @@ This is the same centering trick as C3(iv) in the Chapter 6 homework. Replace *o
 # Then add: summary( reg12 )
 # Then add: confint( reg12 )
 reg12 <- lm( approve ~ white + hrat + obrat + loanprc + unem + male + married + dep + sch + cosign + chist + pubrec + mortlat1 + mortlat2 + vr + I(white * (obrat - 32)), data = loanapp )
-summary (reg12)
-
+summary ( reg12 )
+confint(reg12)
 ```
 
-**Answer:**
+**Answer: When we make obrat = 32, we see that we end up with the same coefficient as we had before. Our confidence interval is from 0.0035962719 to 0.012579558.**
 
 ------------------------------------------------------------------------
 
@@ -232,38 +232,48 @@ Use the data in CHARITY to answer this question. The variable *respond* is a dum
 ### (i) Estimate a linear probability model relating *respond* to *resplast* and *avggift*. Report the results in the usual form, and interpret the coefficient on *resplast*.
 
 ```{r}
+# Respond is if the person responded with contribution or not
+# Resplast is the response of the previous mailing. 1 or 0.
+# avggift is average of past gifts
+
 reg13 <- lm( respond ~ resplast + avggift, data = charity )
 summary( reg13 )
 ```
 
-**Answer:**
+**Answer: The intercept of our linear probability model is 0.28208796. The coefficient on resplast is 0.34366051 and the coefficient on avggift is 0.00015358. Interpreting the coefficient on resplast, when a person responded to a previous mailing, this increases their chance of responding to the current mailing by 0.34366051 percent.**
 
 ### (ii) Does the average value of past gifts seem to affect the probability of responding?
 
 Think about both statistical and practical significance. The typical person's average gift is 10 to 25 guilders. How much does the probability change for a gift that is 10 guilders higher?
 
-**Answer:**
+**Answer: It seems as though the average value of past gives does not seem to affect the probability as much as if the person responded to the last mailing. We have a t-value of 1.708, meaning we fail to reject the null hypothesis. When we test the model with a gift of 10 and 35, we see that the difference in percentage holding all else equal is a 0.0038395 percent difference.**
 
 ### (iii) Add the variable *propresp* to the model, and interpret its coefficient. (Be careful here: an increase of one in *propresp* is the largest possible change.)
 
 ```{r}
 # Your turn: copy the reg13 line, add + propresp, and name it reg14
 # Then add: summary( reg14 )
-
+#propresp is the proportion of times the person has responded to past mailings.
+reg14 <- lm( respond ~ resplast + avggift + propresp, data = charity )
+summary( reg14 )
 ```
 
-**Answer:**
+**Answer: If we have a change in proportion by one, that means that the probability of the person gifting something increases by 0.74868437 percent.**
 
 ### (iv) What happened to the coefficient on *resplast* when *propresp* was added to the regression? Does this make sense?
 
-**Answer:**
+**Answer: The coefficient on resplast goes down. This makes sense because resplast is if they responded to the previous mailing, which is related to propresp since the propotion will be related to if they responded to the last mailing. The coefficient went down resplast held information that propresp now has**
 
 ### (v) Add *mailsyear*, the number of mailings per year, to the model. How big is its estimated effect? Why might this not be a good estimate of the causal effect of mailings on responding?
 
 ```{r}
 # Your turn: write this regression yourself (add mailsyear to reg14) and name it reg15
 # Then add: summary( reg15 )
+reg15 <- lm( respond ~ resplast + avggift + propresp + mailsyear, data = charity )
+summary(reg15)
+
+
 
 ```
 
-**Answer:**
+**Answer: When we add mailing per year, we see that it's estimated effect is about 0.06200977.**
